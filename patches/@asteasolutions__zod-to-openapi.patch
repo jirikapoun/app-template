@@ -1,0 +1,17 @@
+diff --git a/dist/zod-extensions.d.ts b/dist/zod-extensions.d.ts
+index 2026cefeae24ccc7a8675093f6dceb873b294512..b95c87733957de5eb9f27f74490febd937f432cf 100644
+--- a/dist/zod-extensions.d.ts
++++ b/dist/zod-extensions.d.ts
+@@ -55,9 +55,9 @@ export interface ZodOpenApiFullMetadata<T = any> extends ZodOpenApiFullMetadataF
+     _internal?: ZodOpenAPIInternalMetadata;
+ }
+ declare module 'zod' {
+-    interface ZodType<out Output = unknown, out Input = unknown, out Internals extends core.$ZodTypeInternals<Output, Input> = core.$ZodTypeInternals<Output, Input>> extends core.$ZodType<Output, Input, Internals> {
+-        openapi(metadata: Partial<ZodOpenAPIMetadata<Input>>, options?: OpenApiOptions): this;
+-        openapi(refId: string, metadata?: Partial<ZodOpenAPIMetadata<Input>>, options?: OpenApiOptions): this;
++    interface ZodType<out Output = unknown, out Input = unknown, out Internals extends core.$ZodTypeInternals = core.$ZodTypeInternals> extends core.$ZodType<Output, Input, Internals> {
++        openapi(metadata: Partial<ZodOpenAPIMetadata<Internals['input']>>, options?: OpenApiOptions): this;
++        openapi(refId: string, metadata?: Partial<ZodOpenAPIMetadata<Internals['input']>>, options?: OpenApiOptions): this;
+     }
+ }
+ export declare function extendZodWithOpenApi(zod: typeof z): void;

@@ -1,0 +1,6 @@
+onlyBuiltDependencies:
+  - esbuild
+allowBuilds:
+  esbuild: true
+patchedDependencies:
+  '@asteasolutions/zod-to-openapi': patches/@asteasolutions__zod-to-openapi.patch
