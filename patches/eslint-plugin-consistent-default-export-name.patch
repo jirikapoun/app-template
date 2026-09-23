@@ -1,0 +1,63 @@
+diff --git a/lib/rules/default-export-match-filename.js b/lib/rules/default-export-match-filename.js
+index 765ae31521f85c74e4c3353865be8bb87a0b5b7b..d25043fc9828b9bfb2e6ad5602f251848d2d8079 100644
+--- a/lib/rules/default-export-match-filename.js
++++ b/lib/rules/default-export-match-filename.js
+@@ -20,7 +20,7 @@ var path = require('path'),
+     transformNames = Object.keys(transforms),
+     transformSchema = { enum: transformNames.concat([null]) };
+ 
+-function getStringToCheckAgainstExport(parsed, replacePattern) {
++function getStringToCheckAgainstExport(parsed, replacePattern, replaceWith) {
+     var dirArray = parsed.dir.split(path.sep);
+     var lastDirectory = dirArray[dirArray.length - 1];
+ 
+@@ -28,8 +28,8 @@ function getStringToCheckAgainstExport(parsed, replacePattern) {
+         return lastDirectory;
+     } else {
+         return replacePattern
+-            ? parsed.name.replace(replacePattern, '')
+-            : parsed.name;
++            ? parsed.name.replace(/^\./, '').replace(replacePattern, replaceWith)
++            : parsed.name.replace(/^\./, '');
+     }
+ }
+ 
+@@ -83,7 +83,10 @@ module.exports = {
+                 ],
+             },
+             {
+-                type: ['string', 'null'],
++              oneOf: [
++                { type: ['string', 'null'] },
++                [ { type: 'string' }, { type: 'string' }],
++              ],
+             },
+             {
+                 type: ['boolean', 'null'],
+@@ -95,9 +98,14 @@ module.exports = {
+             Program: function (node) {
+                 var transforms = getTransformsFromOptions(context.options[0]),
+                     replacePattern = context.options[1]
+-                        ? new RegExp(context.options[1])
++                        ? new RegExp(context.options[1] instanceof Array
++                          ? context.options[1][0]
++                          : context.options[1])
+                         : null,
+-                    filename = context.getFilename(),
++                    replaceWith = context.options[1] instanceof Array
++                        ? context.options[1][1]
++                        : '',
++                    filename = context.filename,
+                     absoluteFilename = path.resolve(filename),
+                     parsed = parseFilename(absoluteFilename),
+                     shouldIgnore = isIgnoredFilename(filename),
+@@ -105,7 +113,8 @@ module.exports = {
+                     isExporting = Boolean(exportedName),
+                     expectedExport = getStringToCheckAgainstExport(
+                         parsed,
+-                        replacePattern
++                        replacePattern,
++                        replaceWith
+                     ),
+                     transformedNames = transform(exportedName, transforms),
+                     everythingIsIndex =

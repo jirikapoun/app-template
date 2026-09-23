@@ -1,11 +1,11 @@
-import {z} from "@hono/zod-openapi";
+import { z } from '@hono/zod-openapi'
 
-const test = z.object({
-  b: z.literal('A')
-})
 
 const statusRequests = {
-  test
+
+  test: z.object({
+    b: z.literal('A'),
+  }),
 }
 
 export default statusRequests

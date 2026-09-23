@@ -1,0 +1,30 @@
+diff --git a/index.mjs b/index.mjs
+index 5d29659730ab7b26a0344e57bfee1707497b04a2..f226ab3825cb44d7854ec63ba737314164561d5b 100644
+--- a/index.mjs
++++ b/index.mjs
+@@ -654,4 +654,4 @@ export default defineConfig({
+     // Disabled because ES Modules require file extension to be supplied
+     // 'import/extensions': ['warn', { json: 'aways' }],
+   },
+-})
++})[0]
+diff --git a/optional.mjs b/optional.mjs
+index c3e665b966ba01320e9908b1b92873bbfcf81f79..e572168479eb50678783245af176c006499c6880 100644
+--- a/optional.mjs
++++ b/optional.mjs
+@@ -49,4 +49,4 @@ export default defineConfig({
+     // Reports if a resolved path is imported more than once
+     'import/no-duplicates': 'warn',
+   },
+-})
++})[0]
+diff --git a/style.mjs b/style.mjs
+index d2afb6dc1860b9af47e7185423ed861034ec0612..46c83f6f403fe18ac44b7acb309da5c3abf694bb 100644
+--- a/style.mjs
++++ b/style.mjs
+@@ -606,4 +606,4 @@ export default defineConfig({
+     // Enforces having an empty line after the last top-level import statement or require call
+     'import/newline-after-import': 'warn',
+   },
+-})
++})[0]

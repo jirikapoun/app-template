@@ -1,0 +1,10 @@
+diff --git a/index.mjs b/index.mjs
+index c1b306aa46a9f842fe2e0d32cbaf5cc84a0b971f..82217926ebc3a3c330be58b28bd7da09081d370a 100644
+--- a/index.mjs
++++ b/index.mjs
+@@ -116,4 +116,4 @@ export default defineConfig({
+     // so we should not use those.
+     'node/no-deprecated-api': 'warn',
+   },
+-})
++})[0]

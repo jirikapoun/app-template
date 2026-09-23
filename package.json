@@ -10,12 +10,22 @@
     "@hono/node-server": "^2.1.1",
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.6.3",
+    "@strv/eslint-config-mocha": "^5.0.0",
+    "@strv/eslint-config-node": "^5.0.0",
+    "@strv/eslint-config-typescript": "^6.0.0",
+    "eslint": "^10.11.0",
+    "eslint-plugin-consistent-default-export-name": "^0.0.15",
+    "eslint-plugin-import-x": "^4.17.1",
+    "eslint-plugin-local-rules": "^3.0.2",
+    "eslint-plugin-modules-newline": "^0.0.6",
+    "globals": "^17.12.0",
     "hono": "^4.13.8",
     "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "tsx": "^4.23.0",
-    "typescript": "^7.0.2"
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   }
 }

@@ -1,0 +1,10 @@
+diff --git a/index.mjs b/index.mjs
+index 83463372662d27400cbad5b897b8826329a4a31a..41e71408dfc654f9126b6d504a20c6240ebe3e1f 100644
+--- a/index.mjs
++++ b/index.mjs
+@@ -83,4 +83,4 @@ export default defineConfig({
+     // project. Test files are usually sourced by Mocha directly.
+     'import/no-unused-modules': 'off',
+   },
+-})
++})[0]

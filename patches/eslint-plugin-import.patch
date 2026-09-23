@@ -1,0 +1,101 @@
+diff --git a/lib/rules/order.js b/lib/rules/order.js
+index 578709bf0b90c1c794ed7f8c046d9b3edaf0ff0a..82e0b88eda73c0769b641dff6467a7cd05394202 100644
+--- a/lib/rules/order.js
++++ b/lib/rules/order.js
+@@ -28,7 +28,7 @@ function getTokensOrCommentsAfter(sourceCode, node, count) {
+   var currentNodeOrToken = node;
+   var result = [];
+   for (var i = 0; i < count; i++) {
+-    currentNodeOrToken = sourceCode.getTokenOrCommentAfter(currentNodeOrToken);
++    currentNodeOrToken = sourceCode.getTokenAfter(currentNodeOrToken, { includeComments: true });
+     if (currentNodeOrToken == null) {
+       break;
+     }
+@@ -41,7 +41,7 @@ function getTokensOrCommentsBefore(sourceCode, node, count) {
+   var currentNodeOrToken = node;
+   var result = [];
+   for (var i = 0; i < count; i++) {
+-    currentNodeOrToken = sourceCode.getTokenOrCommentBefore(currentNodeOrToken);
++    currentNodeOrToken = sourceCode.getTokenBefore(currentNodeOrToken, { includeComments: true });
+     if (currentNodeOrToken == null) {
+       break;
+     }
+diff --git a/lib/rules/prefer-default-export.js b/lib/rules/prefer-default-export.js
+index a4d827977a55893bda8c501c1e5cd3925f05986a..28ce335f67e6ddc68d847ceaaee8a9563658730d 100644
+--- a/lib/rules/prefer-default-export.js
++++ b/lib/rules/prefer-default-export.js
+@@ -28,9 +28,9 @@ module.exports = {
+ 
+   create: function () {function create(context) {
+       var specifierExportCount = 0;
++      var typeSpecifierExportCount = 0;
+       var hasDefaultExport = false;
+       var hasStarExport = false;
+-      var hasTypeExport = false;
+       var namedExportNode = null;
+       // get options. by default we look into files with single export
+       var _ref = context.options[0] || {},_ref$target = _ref.target,target = _ref$target === undefined ? 'single' : _ref$target;
+@@ -42,8 +42,14 @@ module.exports = {
+             captureDeclaration(property.value);
+           });
+         } else if (identifierOrPattern && identifierOrPattern.type === 'ArrayPattern') {
+-          identifierOrPattern.elements.
+-          forEach(captureDeclaration);
++          identifierOrPattern.elements.forEach(captureDeclaration);
++        } else if (identifierOrPattern && (
++          identifierOrPattern.type === 'TSTypeAliasDeclaration' ||
++          identifierOrPattern.type === 'TSInterfaceDeclaration' ||
++          identifierOrPattern.type === 'TypeAlias' ||
++          identifierOrPattern.type === 'InterfaceDeclaration')
++        ) {
++          typeSpecifierExportCount++;
+         } else {
+           // assume it's a single standard identifier
+           specifierExportCount++;
+@@ -56,7 +62,9 @@ module.exports = {
+           }return ExportDefaultSpecifier;}(),
+ 
+         ExportSpecifier: function () {function ExportSpecifier(node) {
+-            if ((node.exported.name || node.exported.value) === 'default') {
++            if (node.parent && node.parent.exportKind === 'type') {
++                typeSpecifierExportCount++;
++            } else if ((node.exported.name || node.exported.value) === 'default') {
+               hasDefaultExport = true;
+             } else {
+               specifierExportCount++;
+@@ -76,12 +84,8 @@ module.exports = {
+             type === 'TSInterfaceDeclaration' ||
+             type === 'InterfaceDeclaration')
+             {
+-              specifierExportCount++;
+-              hasTypeExport = true;
+-              return;
+-            }
+-
+-            if (node.declaration.declarations) {
++              typeSpecifierExportCount++;
++            } else if (node.declaration.declarations) {
+               node.declaration.declarations.forEach(function (declaration) {
+                 captureDeclaration(declaration.id);
+               });
+@@ -102,7 +106,7 @@ module.exports = {
+           }return ExportAllDeclaration;}(),
+ 
+         'Program:exit': function () {function ProgramExit() {
+-            if (hasDefaultExport || hasStarExport || hasTypeExport) {
++            if (hasDefaultExport || hasStarExport) {
+               return;
+             }
+             if (target === 'single' && specifierExportCount === 1) {
+@@ -110,6 +114,11 @@ module.exports = {
+             } else if (target === 'any' && specifierExportCount > 0) {
+               context.report(namedExportNode, ANY_EXPORT_ERROR_MESSAGE);
+             }
++            if (target === 'single' && typeSpecifierExportCount === 1) {
++              context.report(namedExportNode, SINGLE_EXPORT_ERROR_MESSAGE);
++            } else if (target === 'any' && typeSpecifierExportCount > 0) {
++              context.report(namedExportNode, ANY_EXPORT_ERROR_MESSAGE);
++            }
+           }return ProgramExit;}() };
+ 
+     }return create;}() };
