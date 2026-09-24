@@ -2,6 +2,9 @@
   "name": "@app/schema",
   "description": "API schema definitions for client and server",
   "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
   "exports": {
     "./requests/*": {
       "import": "./dist/requests/*.requests.js"
@@ -11,7 +14,8 @@
     }
   },
   "dependencies": {
-    "@hono/zod-openapi": "^1.6.3"
+    "@hono/zod-openapi": "^1.6.3",
+    "typescript": "^7.0.2"
   },
   "private": true
 }

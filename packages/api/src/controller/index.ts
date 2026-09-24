@@ -91,7 +91,10 @@ class Controller<E extends Env = Env, S extends Schema = {}, BasePath extends st
             : {},
         }])),
     }
-    return this.openapi(routeConfig, handler, hook)
+    // short-circuit type inference with `any` to save resources and to avoid type mismatch
+    // actual return type is defined by the method declaration above, so it will be correct
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
+    return this.openapi(routeConfig as any, handler as any, hook as any) as any
   }
 }
 

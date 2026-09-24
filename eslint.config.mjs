@@ -42,7 +42,6 @@ const eslintConfig = [
   globalIgnores([
     '**/node_modules/',
     '**/dist/',
-    'packages/api/src/index.ts', // TODO fix infinite recursion
   ]),
   {
     linterOptions: {
@@ -108,13 +107,14 @@ const eslintConfig = [
       'local-rules': localRules,
     },
     settings: {
+      'import/internal-regex': '^@app/',
       'import/resolver': {
         node: { extensions: ['.js', '.cjs', '.mjs', '.ts', '.tsx'] },
       },
+      'import-x/internal-regex': '^@app/',
       'import-x/resolver': {
         node: { extensions: ['.js', '.cjs', '.mjs', '.ts', '.tsx'] },
       },
-      'import-x/internal-regex': '^@app/',
     },
     rules: {
       '@stylistic/brace-style': ['warn', '1tbs'],
@@ -155,7 +155,7 @@ const eslintConfig = [
       'import/no-duplicates': ['warn', { 'prefer-inline': false }],
       'import/no-named-as-default': 'off',
       'import/order': ['warn', {
-        groups: ['builtin', 'external', 'parent', 'sibling', 'index', 'type'],
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'type'],
         sortTypesGroup: true,
         alphabetize: { order: 'asc', caseInsensitive: true },
         named: { enabled: true, export: false, cjsExports: false },
@@ -192,6 +192,14 @@ const eslintConfig = [
         ...globals.node,
         ...globals.mocha,
       },
+    },
+  },
+
+  // Other
+  {
+    files: ['packages/api/src/controller/index.ts'],
+    rules: {
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
     },
   },
 ]

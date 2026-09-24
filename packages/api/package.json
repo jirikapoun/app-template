@@ -2,21 +2,26 @@
   "name": "@app/api",
   "description": "API layer of the application server",
   "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js"
     }
   },
   "dependencies": {
-    "@app/api": "*",
-    "@app/schema": "*",
-    "@app/ui": "*",
+    "@app/schema": "workspace:*",
+    "@app/ui": "workspace:*",
+    "@app/utils": "workspace:*",
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.6.3",
     "hono": "^4.13.8"
   },
   "devDependencies": {
-    "@asteasolutions/zod-to-openapi": "^9.1.0"
+    "@asteasolutions/zod-to-openapi": "^9.1.0",
+    "typescript": "^7.0.2",
+    "zod": "^4.6.5"
   },
   "private": true
 }

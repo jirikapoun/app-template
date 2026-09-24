@@ -2,6 +2,9 @@
   "name": "@app/ui",
   "description": "UI layer of the application",
   "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js"
@@ -14,7 +17,8 @@
     "hono": "^4.13.8"
   },
   "devDependencies": {
-    "@app/schema": "*"
+    "@app/schema": "workspace:*",
+    "typescript": "^7.0.2"
   },
   "private": true
 }

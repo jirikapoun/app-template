@@ -1,21 +1,19 @@
+# build
+.turbo/
 dist/
+node_modules/
 
-# dev
-.yarn/
-!.yarn/releases
+# env
+.env
+.env.production
+
+# ide
 .vscode/*
 !.vscode/launch.json
 !.vscode/*.code-snippets
 .idea/workspace.xml
 .idea/usage.statistics.xml
 .idea/shelf
-
-# deps
-node_modules/
-
-# env
-.env
-.env.production
 
 # logs
 logs/

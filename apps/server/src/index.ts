@@ -1,7 +1,7 @@
 import { serve } from '@hono/node-server'
+
 import api from '@app/api'
 import config from '@app/utils/config'
-
 
 
 serve({

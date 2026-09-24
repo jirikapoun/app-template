@@ -1,17 +1,19 @@
 {
   "name": "@app/server",
   "type": "module",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@app/api": "*",
-    "@app/utils": "*",
+    "@app/api": "workspace:*",
+    "@app/utils": "workspace:*",
     "@hono/node-server": "^2.1.1"
   },
   "devDependencies": {
+    "@types/node": "^26.1.1",
     "tsx": "^4.23.0",
     "typescript": "^7.0.2"
   },
