@@ -3,6 +3,7 @@ allowBuilds:
   unrs-resolver: true
 patchedDependencies:
   '@asteasolutions/zod-to-openapi': patches/@asteasolutions__zod-to-openapi.patch
+  '@hono/zod-openapi': patches/@hono__zod-openapi.patch
   '@strv/eslint-config-base': patches/@strv__eslint-config-base.patch
   '@strv/eslint-config-mocha': patches/@strv__eslint-config-mocha.patch
   '@strv/eslint-config-node': patches/@strv__eslint-config-node.patch

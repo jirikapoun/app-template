@@ -1,22 +1,20 @@
-import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
+import StatusView from '../../ui/view/StatusView.js'
 import statusRequests from '../requests/status.requests.js'
-import commonResponses from '../responses/common.responses.js'
 import statusResponses from '../responses/status.responses.js'
+import Controller, { createRoute } from './common.js'
 
 
 const startTime = Date.now()
 
-const statusController = new OpenAPIHono()
+const statusController = new Controller()
 
-  .openapi(createRoute({
+  .endpoint(createRoute({
     method: 'get',
     path: '',
     responses: {
       200: {
-        content: {
-          'application/json': { schema: statusResponses.getStatus },
-          'text/html': { schema: commonResponses.html },
-        },
+        schema: statusResponses.getStatus,
+        view: StatusView,
       },
     },
   }), async ctx =>
@@ -24,7 +22,7 @@ const statusController = new OpenAPIHono()
       uptime: Date.now() - startTime,
     }, 200))
 
-  .openapi(createRoute({
+  .endpoint(createRoute({
     method: 'post',
     path: '/test',
     request: {
@@ -35,7 +33,10 @@ const statusController = new OpenAPIHono()
       },
     },
     responses: {
-      403: {},
+      403: {
+        summary: 'Forbidden',
+        description: 'You shall not pass',
+      },
     },
   }), async ctx =>
     ctx.body(null, 403))
