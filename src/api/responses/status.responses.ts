@@ -12,4 +12,11 @@ const statusResponses = {
   }),
 }
 
+type StatusResponses = {
+  [R in keyof typeof statusResponses]: z.infer<typeof statusResponses[R]>
+}
+
+
 export default statusResponses
+
+export type { StatusResponses }

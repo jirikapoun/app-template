@@ -27,6 +27,10 @@ const tsFiles = {
   files: ['**/{.*,*}.{ts,tsx}'],
 }
 /** @type {Config} */
+const tsxFiles = {
+  files: ['**/{.*,*}.tsx'],
+}
+/** @type {Config} */
 const testFiles = {
   files: ['test/**/*.ts'],
 }
@@ -136,7 +140,7 @@ const eslintConfig = [
         { blankLine: 'never', prev: 'cjs-import', next: 'cjs-import' },
       ],
       '@stylistic/quote-props': ['warn', 'consistent-as-needed'],
-      'consistent-default-export-name/default-export-match-filename': ['warn', ['kebab', 'snake'], ['\\.', '-'], true],
+      'consistent-default-export-name/default-export-match-filename': ['warn', ['kebab'], ['\\.', '-'], true],
       'eqeqeq': ['error', 'smart'],
       'func-names': ['warn', 'as-needed'],
       'import/consistent-type-specifier-style': ['warn', 'prefer-top-level'],
@@ -164,6 +168,14 @@ const eslintConfig = [
       'modules-newline/export-declaration-newline': 'warn',
       'no-empty-function': ['warn', { allow: ['methods'] }],
       'prefer-object-spread': 'warn',
+    },
+  },
+
+  // TSX files
+  {
+    ...tsxFiles,
+    rules: {
+      'consistent-default-export-name/default-export-match-filename': ['warn', null, ['\\.', '-'], true],
     },
   },
 

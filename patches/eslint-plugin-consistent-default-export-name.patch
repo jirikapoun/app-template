@@ -1,5 +1,5 @@
 diff --git a/lib/rules/default-export-match-filename.js b/lib/rules/default-export-match-filename.js
-index 765ae31521f85c74e4c3353865be8bb87a0b5b7b..d25043fc9828b9bfb2e6ad5602f251848d2d8079 100644
+index 765ae31521f85c74e4c3353865be8bb87a0b5b7b..3701f6d7ddd7d5e5e6519f2cb109baeddc2d9f91 100644
 --- a/lib/rules/default-export-match-filename.js
 +++ b/lib/rules/default-export-match-filename.js
 @@ -20,7 +20,7 @@ var path = require('path'),
@@ -22,19 +22,27 @@ index 765ae31521f85c74e4c3353865be8bb87a0b5b7b..d25043fc9828b9bfb2e6ad5602f25184
      }
  }
  
-@@ -83,7 +83,10 @@ module.exports = {
+@@ -83,10 +83,17 @@ module.exports = {
                  ],
              },
              {
 -                type: ['string', 'null'],
-+              oneOf: [
-+                { type: ['string', 'null'] },
-+                [ { type: 'string' }, { type: 'string' }],
-+              ],
++                oneOf: [
++                    { enum: [null] },
++                    { type: 'string' },
++                    [ { type: 'string' }, { type: 'string' }],
++                ],
              },
              {
-                 type: ['boolean', 'null'],
-@@ -95,9 +98,14 @@ module.exports = {
+-                type: ['boolean', 'null'],
++                oneOf: [
++                    { enum: [null] },
++                    { type: 'boolean' },
++                ]
+             },
+         ], // no options
+     },
+@@ -95,9 +102,14 @@ module.exports = {
              Program: function (node) {
                  var transforms = getTransformsFromOptions(context.options[0]),
                      replacePattern = context.options[1]
@@ -51,7 +59,7 @@ index 765ae31521f85c74e4c3353865be8bb87a0b5b7b..d25043fc9828b9bfb2e6ad5602f25184
                      absoluteFilename = path.resolve(filename),
                      parsed = parseFilename(absoluteFilename),
                      shouldIgnore = isIgnoredFilename(filename),
-@@ -105,7 +113,8 @@ module.exports = {
+@@ -105,7 +117,8 @@ module.exports = {
                      isExporting = Boolean(exportedName),
                      expectedExport = getStringToCheckAgainstExport(
                          parsed,

@@ -10,7 +10,7 @@ patchedDependencies:
   '@strv/eslint-config-mocha': f49d7a6485c7aed043d576a3e366c2730c9e1d1ba6bd2be56d96b469fd85934f
   '@strv/eslint-config-node': 9dd73dc93e8d26744e6da68222d9ebc8fb473775fc972ec798aba7422bbb062b
   '@strv/eslint-config-typescript': 4ed435c4ee06b48427045ea4ca0e0c4f34a53c3ea332afa5ef2e0f2e91fe6c9d
-  eslint-plugin-consistent-default-export-name: 9b844e1631347dc6c6fe4c769937dd6a9cc2296116ffc191376a8a92b0c052fb
+  eslint-plugin-consistent-default-export-name: 7dab133d7499efe6066581e52e9999af2bdcaa9a6b0090b3867d2c431e9e1d44
   eslint-plugin-import: 7f179448a25691495897149800c4261f6361d912cea3e8b9852b610bb82a56be
 
 importers:
@@ -40,7 +40,7 @@ importers:
         version: 10.11.0
       eslint-plugin-consistent-default-export-name:
         specifier: ^0.0.15
-        version: 0.0.15(patch_hash=9b844e1631347dc6c6fe4c769937dd6a9cc2296116ffc191376a8a92b0c052fb)
+        version: 0.0.15(patch_hash=7dab133d7499efe6066581e52e9999af2bdcaa9a6b0090b3867d2c431e9e1d44)
       eslint-plugin-import-x:
         specifier: ^4.17.1
         version: 4.17.1(@typescript-eslint/utils@8.70.1(@typescript/typescript6@6.0.2)(eslint@10.11.0))(eslint-import-resolver-node@0.3.10)(eslint@10.11.0)
@@ -2477,7 +2477,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-consistent-default-export-name@0.0.15(patch_hash=9b844e1631347dc6c6fe4c769937dd6a9cc2296116ffc191376a8a92b0c052fb):
+  eslint-plugin-consistent-default-export-name@0.0.15(patch_hash=7dab133d7499efe6066581e52e9999af2bdcaa9a6b0090b3867d2c431e9e1d44):
     dependencies:
       lodash: 4.18.1
       pkg-dir: 5.0.0
