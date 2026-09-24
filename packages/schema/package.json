@@ -1,0 +1,17 @@
+{
+  "name": "@app/schema",
+  "description": "API schema definitions for client and server",
+  "type": "module",
+  "exports": {
+    "./requests/*": {
+      "import": "./dist/requests/*.requests.js"
+    },
+    "./responses/*": {
+      "import": "./dist/responses/*.responses.js"
+    }
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.6.3"
+  },
+  "private": true
+}

@@ -1,3 +1,4 @@
+import { globalIgnores } from '@eslint/config-helpers'
 import mocha from '@strv/eslint-config-mocha'
 import node from '@strv/eslint-config-node'
 import nodeOptional from '@strv/eslint-config-node/optional'
@@ -38,9 +39,11 @@ const testFiles = {
 /** @type {Config[]} */
 const eslintConfig = [
   // General
-  {
-    ignores: ['node_modules', 'dist'],
-  },
+  globalIgnores([
+    '**/node_modules/',
+    '**/dist/',
+    'packages/api/src/index.ts', // TODO fix infinite recursion
+  ]),
   {
     linterOptions: {
       reportUnusedDisableDirectives: true,
@@ -111,6 +114,7 @@ const eslintConfig = [
       'import-x/resolver': {
         node: { extensions: ['.js', '.cjs', '.mjs', '.ts', '.tsx'] },
       },
+      'import-x/internal-regex': '^@app/',
     },
     rules: {
       '@stylistic/brace-style': ['warn', '1tbs'],
@@ -158,7 +162,7 @@ const eslintConfig = [
       }],
       'import/prefer-default-export': ['warn', { target: 'any' }],
       'import-x/order': ['warn', {
-        'groups': [['builtin', 'external', 'parent', 'sibling', 'index'], 'type'],
+        'groups': [['builtin', 'external'], 'internal', ['parent', 'sibling', 'index'], 'type'],
         'newlines-between': 'always',
       }],
       'indent': 'off',

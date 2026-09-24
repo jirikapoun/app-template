@@ -17,16 +17,10 @@ patchedDependencies:
 importers:
 
   .:
-    dependencies:
-      '@hono/node-server':
-        specifier: ^2.1.1
-        version: 2.1.1(hono@4.13.8)
-      '@hono/swagger-ui':
-        specifier: ^0.6.1
-        version: 0.6.1(hono@4.13.8)
-      '@hono/zod-openapi':
-        specifier: ^1.6.3
-        version: 1.6.3(patch_hash=e59effa0669665d43691b92e187adab5874fddfad9a4e20cdc1b056e2944f4b9)(hono@4.13.8)(zod@4.6.5)
+    devDependencies:
+      '@eslint/config-helpers':
+        specifier: ^0.7.0
+        version: 0.7.0
       '@strv/eslint-config-mocha':
         specifier: ^5.0.0
         version: 5.0.0(patch_hash=f49d7a6485c7aed043d576a3e366c2730c9e1d1ba6bd2be56d96b469fd85934f)(@typescript-eslint/parser@8.70.1(@typescript/typescript6@6.0.2)(eslint@10.11.0))(@typescript/typescript6@6.0.2)(eslint-import-resolver-typescript@4.4.5)(eslint@10.11.0)
@@ -54,28 +48,79 @@ importers:
       globals:
         specifier: ^17.12.0
         version: 17.12.0
-      hono:
-        specifier: ^4.13.8
-        version: 4.13.8
-      zod:
-        specifier: ^4.6.5
-        version: 4.6.5
+      typescript:
+        specifier: npm:@typescript/typescript6@^6.0.2
+        version: '@typescript/typescript6@6.0.2'
+
+  apps/server:
+    dependencies:
+      '@app/api':
+        specifier: '*'
+        version: link:../../packages/api
+      '@app/utils':
+        specifier: '*'
+        version: link:../../packages/utils
+      '@hono/node-server':
+        specifier: ^2.1.1
+        version: 2.1.1(hono@4.13.8)
     devDependencies:
-      '@asteasolutions/zod-to-openapi':
-        specifier: ^9.1.0
-        version: 9.1.0(patch_hash=f47b861eacab8dffcec4b9048d1d62b3bb4825550553fb7525aca8ee3df7fd1c)(zod@4.6.5)
-      '@types/node':
-        specifier: ^26.1.1
-        version: 26.6.2
-      '@typescript/native':
-        specifier: npm:typescript@^7.0.2
-        version: typescript@7.0.2
       tsx:
         specifier: ^4.23.0
         version: 4.23.15
       typescript:
-        specifier: npm:@typescript/typescript6@^6.0.2
-        version: '@typescript/typescript6@6.0.2'
+        specifier: ^7.0.2
+        version: 7.0.2
+
+  packages/api:
+    dependencies:
+      '@app/api':
+        specifier: '*'
+        version: 'link:'
+      '@app/schema':
+        specifier: '*'
+        version: link:../schema
+      '@app/ui':
+        specifier: '*'
+        version: link:../ui
+      '@hono/swagger-ui':
+        specifier: ^0.6.1
+        version: 0.6.1(hono@4.13.8)
+      '@hono/zod-openapi':
+        specifier: ^1.6.3
+        version: 1.6.3(patch_hash=e59effa0669665d43691b92e187adab5874fddfad9a4e20cdc1b056e2944f4b9)(hono@4.13.8)(zod@4.6.5)
+      hono:
+        specifier: ^4.13.8
+        version: 4.13.8
+    devDependencies:
+      '@asteasolutions/zod-to-openapi':
+        specifier: ^9.1.0
+        version: 9.1.0(patch_hash=f47b861eacab8dffcec4b9048d1d62b3bb4825550553fb7525aca8ee3df7fd1c)(zod@4.6.5)
+
+  packages/schema:
+    dependencies:
+      '@hono/zod-openapi':
+        specifier: ^1.6.3
+        version: 1.6.3(patch_hash=e59effa0669665d43691b92e187adab5874fddfad9a4e20cdc1b056e2944f4b9)(hono@4.13.8)(zod@4.6.5)
+
+  packages/ui:
+    dependencies:
+      hono:
+        specifier: ^4.13.8
+        version: 4.13.8
+    devDependencies:
+      '@app/schema':
+        specifier: '*'
+        version: link:../schema
+
+  packages/utils:
+    dependencies:
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
+    devDependencies:
+      '@types/node':
+        specifier: ^26.1.1
+        version: 26.6.2
 
 packages:
 

@@ -1,16 +1,12 @@
 {
-  "name": "app-template",
+  "name": "app",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js"
+    "lint": "eslint ."
   },
-  "dependencies": {
-    "@hono/node-server": "^2.1.1",
-    "@hono/swagger-ui": "^0.6.1",
-    "@hono/zod-openapi": "^1.6.3",
+  "devDependencies": {
+    "@eslint/config-helpers": "^0.7.0",
     "@strv/eslint-config-mocha": "^5.0.0",
     "@strv/eslint-config-node": "^5.0.0",
     "@strv/eslint-config-typescript": "^6.0.0",
@@ -20,14 +16,11 @@
     "eslint-plugin-local-rules": "^3.0.2",
     "eslint-plugin-modules-newline": "^0.0.6",
     "globals": "^17.12.0",
-    "hono": "^4.13.8",
-    "zod": "^4.6.5"
-  },
-  "devDependencies": {
-    "@asteasolutions/zod-to-openapi": "^9.1.0",
-    "@types/node": "^26.1.1",
-    "@typescript/native": "npm:typescript@^7.0.2",
-    "tsx": "^4.23.0",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
+  },
+  "private": true,
+  "engines": {
+    "node": "~26",
+    "pnpm": "~12"
   }
 }

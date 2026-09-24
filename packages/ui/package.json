@@ -1,0 +1,20 @@
+{
+  "name": "@app/ui",
+  "description": "UI layer of the application",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./view/*": {
+      "import": "./dist/view/*.js"
+    }
+  },
+  "dependencies": {
+    "hono": "^4.13.8"
+  },
+  "devDependencies": {
+    "@app/schema": "*"
+  },
+  "private": true
+}

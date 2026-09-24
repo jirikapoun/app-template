@@ -1,5 +1,6 @@
-import { z } from '@hono/zod-openapi'
-import packageJson from '../package.json' with { type: 'json' }
+import { z } from 'zod'
+
+import rootPackageJson from '../../../package.json' with { type: 'json' }
 
 
 if (!('NODE_ENV' in process.env)) {
@@ -16,7 +17,7 @@ const boolean = (defaultValue: boolean) => z
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']),
   PORT: z.coerce.number().default(3000).describe('HTTP port the server listens on'),
-  APP_NAME: z.string().default(packageJson.name).describe('Application name shown in the frontend'),
+  APP_NAME: z.string().default(rootPackageJson.name).describe('Application name shown in the frontend'),
   API_DOCS: boolean(true).describe('Enables public API documentation'),
   // DATABASE_URL: z.string(),
   // JWT_SECRET: z.string(),
@@ -29,7 +30,7 @@ const config = {
   nodeEnv: env.NODE_ENV,
   port: env.PORT,
   appName: env.APP_NAME,
-  appVersion: packageJson.version,
+  appVersion: rootPackageJson.version,
   apiDocs: env.API_DOCS,
 } as const
 

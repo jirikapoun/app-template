@@ -1,4 +1,4 @@
-import type { StatusResponses } from '../../api/responses/status.responses.js'
+import type { StatusResponses } from '@app/schema/responses/status'
 
 
 const StatusView = async ({ uptime }: StatusResponses['getStatus']) => (

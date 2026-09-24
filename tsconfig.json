@@ -1,4 +1,12 @@
 {
+  "include": [
+    "apps/**/*.ts",
+    "packages/**/*.ts",
+    "packages/**/*.tsx"
+  ],
+  "exclude": [
+    "**/node_modules"
+  ],
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
@@ -10,8 +18,14 @@
     ],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "rootDir": "./src",
-    "outDir": "./dist"
-  },
-  "exclude": ["node_modules"]
+    "baseUrl": ".",
+    "outDir": "./dist",
+    "paths": {
+      "@app/api": ["packages/api/src/index.ts"],
+      "@app/schema/requests/*": ["packages/schema/src/requests/*.requests.ts"],
+      "@app/schema/responses/*": ["packages/schema/src/responses/*.responses.ts"],
+      "@app/ui/*": ["packages/ui/src/*.tsx"],
+      "@app/utils/*": ["packages/utils/src/*.ts"]
+    }
+  }
 }

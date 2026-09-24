@@ -1,0 +1,22 @@
+{
+  "name": "@app/api",
+  "description": "API layer of the application server",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@app/api": "*",
+    "@app/schema": "*",
+    "@app/ui": "*",
+    "@hono/swagger-ui": "^0.6.1",
+    "@hono/zod-openapi": "^1.6.3",
+    "hono": "^4.13.8"
+  },
+  "devDependencies": {
+    "@asteasolutions/zod-to-openapi": "^9.1.0"
+  },
+  "private": true
+}

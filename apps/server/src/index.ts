@@ -1,10 +1,11 @@
 import { serve } from '@hono/node-server'
-import server from './api/server.js'
-import config from './config.js'
+import api from '@app/api'
+import config from '@app/utils/config'
+
 
 
 serve({
-  fetch: server.fetch,
+  fetch: api.fetch,
   port: config.port,
 }, info => {
   console.log(`Server is running on http://localhost:${info.port}`)

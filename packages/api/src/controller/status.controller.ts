@@ -1,7 +1,8 @@
-import StatusView from '../../ui/view/StatusView.js'
-import statusRequests from '../requests/status.requests.js'
-import statusResponses from '../responses/status.responses.js'
-import Controller, { createRoute } from './common.js'
+import statusRequests from '@app/schema/requests/status'
+import statusResponses from '@app/schema/responses/status'
+import StatusView from '@app/ui/view/StatusView'
+
+import Controller, { createRoute } from './index.js'
 
 
 const startTime = Date.now()

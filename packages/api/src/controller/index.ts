@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-shadow,@typescript-eslint/no-explicit-any */
-import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
+/* eslint-disable @typescript-eslint/no-shadow */
+import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
 
-import type { ZodMediaTypeObject, ResponseConfig } from '@asteasolutions/zod-to-openapi'
-import type { Hook, RouteConfig, ComputeInput, RouteMiddlewareParams } from '@hono/zod-openapi'
+import type { ResponseConfig, ZodMediaTypeObject } from '@asteasolutions/zod-to-openapi'
+import type { ComputeInput, Hook, RouteConfig, RouteMiddlewareParams } from '@hono/zod-openapi'
 import type { TypedResponse } from 'hono'
 import type { Env, Handler, Input, MergePath, MiddlewareHandler, Schema, ToSchema } from 'hono/types'
 import type { ClientErrorStatusCode, InfoStatusCode, RedirectStatusCode, ServerErrorStatusCode, StatusCode, SuccessStatusCode } from 'hono/utils/http-status'
@@ -66,7 +66,7 @@ class Controller<E extends Env = Env, S extends Schema = {}, BasePath extends st
       E,
       P,
     BoundRouteResponseTypes<R>['handler'] | undefined
-    >
+    >,
   ): Controller<
     E,
   S & ToSchema<
@@ -86,10 +86,10 @@ class Controller<E extends Env = Env, S extends Schema = {}, BasePath extends st
           ...responseConfig
         }]) => [statusCode, {
           ...responseConfig,
-          ...(schema
+          ...schema
             ? { content: { 'application/json': { schema } } }
-            : {})
-        }]))
+            : {},
+        }])),
     }
     return this.openapi(routeConfig, handler, hook)
   }

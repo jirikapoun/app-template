@@ -1,0 +1,17 @@
+{
+  "name": "@app/utils",
+  "description": "Shared utility layer for application server",
+  "type": "module",
+  "exports": {
+    "./*": {
+      "import": "./dist/*.js"
+    }
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1"
+  },
+  "private": true
+}
