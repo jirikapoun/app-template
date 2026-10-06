@@ -6,11 +6,13 @@ import { secureHeaders } from 'hono/secure-headers'
 import config from '@app/utils/config'
 
 import statusController from './controller/status.controller.js'
+import renderingMiddleware from './middleware/rendering.middleware.js'
 
 
 const hono = new OpenAPIHono()
   .use(compress())
-  .use(secureHeaders()) as OpenAPIHono
+  .use(secureHeaders())
+  .use(renderingMiddleware) as OpenAPIHono
 
 const api = hono
   .route('/status', statusController)

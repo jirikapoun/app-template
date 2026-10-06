@@ -2,8 +2,8 @@
   "extends": "./tsconfig.base.json",
   "include": [
     "./apps/*/src/*.ts",
-    "./packages/*/src/*.ts",
-    "./packages/*/src/*.tsx"
+    "./packages/*/src/**/*.ts",
+    "./packages/*/src/**/*.tsx"
   ],
   "compilerOptions": {
     "types": [

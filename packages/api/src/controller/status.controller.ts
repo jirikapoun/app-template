@@ -1,3 +1,5 @@
+import { z } from '@hono/zod-openapi'
+
 import statusRequests from '@app/schema/requests/status'
 import statusResponses from '@app/schema/responses/status'
 import StatusView from '@app/ui/view/StatusView'
@@ -19,7 +21,7 @@ const statusController = new Controller()
       },
     },
   }), async ctx =>
-    ctx.json({
+    ctx.render({
       uptime: Date.now() - startTime,
     }, 200))
 

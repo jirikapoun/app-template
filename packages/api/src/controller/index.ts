@@ -8,6 +8,7 @@ import type { Env, Handler, Input, MergePath, MiddlewareHandler, Schema, ToSchem
 import type { ClientErrorStatusCode, InfoStatusCode, RedirectStatusCode, ServerErrorStatusCode, StatusCode, SuccessStatusCode } from 'hono/utils/http-status'
 import type { JSONParsed } from 'hono/utils/types'
 import type { z, ZodType } from 'zod'
+import type { View } from '@app/ui/view/index'
 
 
 type MaybePromise<T> = Promise<T> | T
@@ -77,24 +78,38 @@ class Controller<E extends Env = Env, S extends Schema = {}, BasePath extends st
   >,
   BasePath
   > {
+    const responseEntries = Object.entries(responses as CustomRouteConfigWithViews<R>['responses'])
     const routeConfig = {
       ...customRouteConfig,
-      responses: Object.fromEntries(Object
-        .entries(responses)
+      responses: Object.fromEntries(responseEntries
         .map(([statusCode, {
           schema,
+          view,
           ...responseConfig
         }]) => [statusCode, {
           ...responseConfig,
-          ...schema
-            ? { content: { 'application/json': { schema } } }
+          ...schema || view
+            ? {
+              content: {
+                ...schema ? { 'application/json': { schema } } : {},
+                ...view ? { 'text/html': { /* TODO */ } } : {},
+              },
+            }
             : {},
         }])),
     }
+    for (const [statusCode, { view }] of responseEntries) {
+      if (view) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        (handler as any).views ??= new Map()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
+        ;(handler as any).views.set(Number(statusCode), view as any)
+      }
+    }
     // short-circuit type inference with `any` to save resources and to avoid type mismatch
     // actual return type is defined by the method declaration above, so it will be correct
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
-    return this.openapi(routeConfig as any, handler as any, hook as any) as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this.openapi(routeConfig as any, handler as any, hook as any) as never
   }
 }
 
@@ -105,10 +120,18 @@ type CustomRouteConfig = Omit<RouteConfig, 'responses'> & {
     }
   }
 }
+type CustomRouteConfigWithViews<R extends CustomRouteConfig> = R & {
+  responses: {
+    [statusCode in keyof R['responses']]: Omit<ResponseConfig, 'content'> & {
+      schema?: R['responses'][statusCode] extends { schema: ZodType } ? R['responses'][statusCode]['schema'] : never
+      view?: View<R['responses'][statusCode] extends { schema: ZodType } ? z.infer<R['responses'][statusCode]['schema']> & {} : {}>
+    }
+  }
+}
 type ConvertPathType<T extends string> = T extends `${infer Start}/{${infer Param}}${infer Rest}` ? `${Start}/:${Param}${ConvertPathType<Rest>}` : T
 const customCreateRoute = createRoute as <P extends string, R extends Omit<CustomRouteConfig, 'path'> & {
   path: P
-}>(routeConfig: R) => R & {
+}>(routeConfig: CustomRouteConfigWithViews<R>) => R & {
   getRoutingPath(): ConvertPathType<R['path']>
 }
 
