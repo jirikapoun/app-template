@@ -19,9 +19,11 @@
     "manifest.d.ts"
   ],
   "peerDependencies": {
+    "@maveric/client": "workspace:*",
     "vite": "^8.3.3"
   },
   "devDependencies": {
+    "@maveric/client": "workspace:*",
     "@types/node": "^26.6.4",
     "typescript": "^7.0.2",
     "vite": "^8.3.3"

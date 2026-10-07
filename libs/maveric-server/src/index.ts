@@ -143,8 +143,4 @@ export {
   route,
 }
 
-export type {
-  ClientEntry,
-  ClientManifest,
-  RenderingOptions,
-} from './rendering.js'
+export type { RenderingOptions } from './rendering.js'

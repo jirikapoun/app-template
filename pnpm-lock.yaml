@@ -299,6 +299,9 @@ importers:
 
   libs/maveric-vite:
     devDependencies:
+      '@maveric/client':
+        specifier: workspace:*
+        version: link:../maveric-client
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.4
