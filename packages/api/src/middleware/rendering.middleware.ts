@@ -4,6 +4,8 @@ import { matchedRoutes } from 'hono/route'
 import React from 'react'
 import { renderToString } from 'react-dom/server'
 
+import App from '@app/ui/App'
+
 import type { TypedResponse } from 'hono'
 import type { RouterRoute } from 'hono/types'
 import type { ResponseHeader } from 'hono/utils/headers'
@@ -45,9 +47,11 @@ const renderingMiddleware = createMiddleware(async (ctx, next) => {
       return ctx.json(object, status, headers)
     }
 
-    const element = React.createElement(view, object as T & {})
-    const html = renderToString(element)
+    const viewElement = React.createElement(view, object as T & {})
+    const appElement = React.createElement(App, { view: viewElement })
+    const appHtml = renderToString(appElement)
 
+    const html = `<!DOCTYPE html>${appHtml}`
     return ctx.html(html, status, headers) as never
   })
   await next()
