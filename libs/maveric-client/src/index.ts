@@ -9,9 +9,26 @@ type View<P> = SyncComponent<P> & {
   displayName?: string
 }
 
+// data the server passes to the browser runtime to hydrate the rendered view
+interface Payload {
+  /** URL of the view module */
+  view: string
+  /** props the view has been rendered with */
+  props: unknown
+}
+
+/** id of the <script type="application/json"> element containing the payload */
+const PAYLOAD_ELEMENT_ID = '__maveric'
+
 const view = <PropsSchema extends ZodType>(component: SyncComponent<z.infer<PropsSchema>>) =>
   component as View<z.infer<PropsSchema>>
 
-export { view }
+export {
+  PAYLOAD_ELEMENT_ID,
+  view,
+}
 
-export type { View }
+export type {
+  Payload,
+  View,
+}

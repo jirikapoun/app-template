@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "turbo build --filter=@maveric/vite --output-logs=errors-only && vite",
     "lint": "eslint ."
   },
   "devDependencies": {
@@ -20,8 +20,8 @@
     "turbo": "^2.11.3",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "@hono/vite-dev-server": "^0.26.1",
-    "vite": "^8.3.3",
-    "vite-ssr-components": "^0.8.0"
+    "@maveric/vite": "workspace:*",
+    "vite": "^8.3.3"
   },
   "private": true,
   "engines": {

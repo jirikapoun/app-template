@@ -1,5 +1,7 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
 
+import { rendering } from './rendering.js'
+
 import type { ResponseConfig, ZodMediaTypeObject } from '@asteasolutions/zod-to-openapi'
 import type { ComputeInput, Hook, RouteConfig, RouteMiddlewareParams } from '@hono/zod-openapi'
 import type { View } from '@maveric/client'
@@ -137,5 +139,12 @@ const route = createRoute as <P extends string, R extends Omit<CustomRouteConfig
 
 export {
   Controller,
+  rendering,
   route,
 }
+
+export type {
+  ClientEntry,
+  ClientManifest,
+  RenderingOptions,
+} from './rendering.js'

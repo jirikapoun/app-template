@@ -18,7 +18,9 @@
       "@app/ui/*": ["./packages/ui/src/*.tsx"],
       "@app/utils/*": ["./packages/utils/src/*.ts"],
       "@maveric/client": ["./libs/maveric-client/src/index.ts"],
-      "@maveric/server": ["./libs/maveric-server/src/index.ts"]
+      "@maveric/client/runtime": ["./libs/maveric-client/src/runtime.ts"],
+      "@maveric/server": ["./libs/maveric-server/src/index.ts"],
+      "@maveric/vite": ["./libs/maveric-vite/src/index.ts"]
     }
   }
 }

@@ -9,14 +9,23 @@
   "exports": {
     ".": {
       "import": "./dist/index.js"
+    },
+    "./runtime": {
+      "import": "./dist/runtime.js"
     }
   },
   "files": [
     "dist"
   ],
+  "peerDependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
   "devDependencies": {
-    "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "typescript": "^7.0.2",
     "zod": "^4.6.5"
   }

@@ -26,7 +26,6 @@
     "@types/react": "^19.3.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.3",
-    "vite-ssr-components": "^0.8.0",
     "zod": "^4.6.5"
   },
   "private": true

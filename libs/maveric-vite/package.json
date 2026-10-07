@@ -1,0 +1,29 @@
+{
+  "name": "@maveric/vite",
+  "version": "0.0.1",
+  "description": "MVC-inspired framework for building full-stack applications and APIs",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./manifest": {
+      "types": "./manifest.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "manifest.d.ts"
+  ],
+  "peerDependencies": {
+    "vite": "^8.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.3"
+  }
+}

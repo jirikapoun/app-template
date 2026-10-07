@@ -17,12 +17,12 @@
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.6.3",
     "@maveric/server": "workspace:*",
-    "@types/react-dom": "^19.3.0",
     "hono": "^4.13.8",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
+    "@maveric/vite": "workspace:*",
     "@types/react": "^19.3.0",
     "typescript": "^7.0.2"
   },

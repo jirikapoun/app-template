@@ -1,18 +1,19 @@
 import { swaggerUI } from '@hono/swagger-ui'
 import { OpenAPIHono } from '@hono/zod-openapi'
+import { rendering } from '@maveric/server'
 import { compress } from 'hono/compress'
 import { secureHeaders } from 'hono/secure-headers'
+import manifest from 'virtual:maveric/manifest'
 
 import config from '@app/utils/config'
 
 import statusController from './controller/status.controller.js'
-import renderingMiddleware from './middleware/rendering.middleware.js'
 
 
 const hono = new OpenAPIHono()
   .use(compress())
   .use(secureHeaders())
-  .use(renderingMiddleware) as OpenAPIHono
+  .use(rendering({ manifest })) as OpenAPIHono
 
 const api = hono
   .route('/status', statusController)
