@@ -4,8 +4,6 @@ import { matchedRoutes } from 'hono/route'
 import React from 'react'
 import { renderToString } from 'react-dom/server'
 
-import App from '@app/ui/App'
-
 import type { TypedResponse } from 'hono'
 import type { RouterRoute } from 'hono/types'
 import type { ResponseHeader } from 'hono/utils/headers'
@@ -19,11 +17,11 @@ type JSONRespondReturn<T extends JSONValue | {} | InvalidJSONValue, U extends Co
 declare module 'hono' {
   interface ContextRenderer {
     // eslint-disable-next-line
-    <T extends JSONValue | {} | InvalidJSONValue, U extends ContentfulStatusCode = ContentfulStatusCode>(object: T, status?: U, headers?: HeaderRecord): JSONRespondReturn<T, U>
+    <T extends JSONValue | {} | InvalidJSONValue, U extends ContentfulStatusCode = ContentfulStatusCode>(object: T, status: U, headers?: HeaderRecord): JSONRespondReturn<T, U>
   }
 }
 const renderingMiddleware = createMiddleware(async (ctx, next) => {
-  ctx.setRenderer(<T extends JSONValue | {} | InvalidJSONValue, U extends ContentfulStatusCode = ContentfulStatusCode>(object: T, status?: U, headers?: HeaderRecord): JSONRespondReturn<T, U> => {
+  ctx.setRenderer(<T extends JSONValue | {} | InvalidJSONValue, U extends ContentfulStatusCode = ContentfulStatusCode>(object: T, status: U, headers?: HeaderRecord): JSONRespondReturn<T, U> => {
     const accept = accepts(ctx, {
       header: 'Accept',
       supports: ['text/html', 'application/json'],
@@ -40,18 +38,17 @@ const renderingMiddleware = createMiddleware(async (ctx, next) => {
       return ctx.json(object, status, headers)
     }
 
-    const statusCode = ctx.res.status
-    const view = lastRoute.handler.views.get(statusCode) as React.ComponentType<T & {}> | undefined
+    const view = lastRoute.handler.views.get(status) as React.ComponentType<T & {}> | undefined
     if (!view) {
       // TODO at least log a warning that the route has no view defined for the given status code
       return ctx.json(object, status, headers)
     }
 
+    // views render the whole document, including <html>
     const viewElement = React.createElement(view, object as T & {})
-    const appElement = React.createElement(App, { view: viewElement })
-    const appHtml = renderToString(appElement)
+    const viewHtml = renderToString(viewElement)
 
-    const html = `<!DOCTYPE html>${appHtml}`
+    const html = `<!DOCTYPE html>${viewHtml}`
     return ctx.html(html, status, headers) as never
   })
   await next()

@@ -2,19 +2,20 @@ import { ViteClient } from 'vite-ssr-components/react'
 
 
 interface AppProps {
-  view: React.ReactNode
+  title: string
+  children: React.ReactNode
 }
 
-const App = ({ view }: AppProps) => (
+const App = ({ title, children }: AppProps) => (
   <html lang="en">
     <head>
       <link rel="icon" type="image/svg+xml" href='/favicon.svg' />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Vite + React + Hono</title>
+      <title>{title}</title>
       <ViteClient />
     </head>
     <body>
-      <div id="view">{view}</div>
+      <div id="view">{children}</div>
     </body>
   </html>)
 
