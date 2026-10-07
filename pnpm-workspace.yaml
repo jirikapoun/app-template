@@ -16,3 +16,4 @@ patchedDependencies:
   '@strv/eslint-config-typescript': patches/@strv__eslint-config-typescript.patch
   eslint-plugin-consistent-default-export-name: patches/eslint-plugin-consistent-default-export-name.patch
   eslint-plugin-import: patches/eslint-plugin-import.patch
+  eslint-plugin-modules-newline: patches/eslint-plugin-modules-newline.patch

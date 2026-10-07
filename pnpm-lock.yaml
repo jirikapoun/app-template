@@ -171,6 +171,7 @@ patchedDependencies:
   '@strv/eslint-config-typescript': 4ed435c4ee06b48427045ea4ca0e0c4f34a53c3ea332afa5ef2e0f2e91fe6c9d
   eslint-plugin-consistent-default-export-name: 7dab133d7499efe6066581e52e9999af2bdcaa9a6b0090b3867d2c431e9e1d44
   eslint-plugin-import: 7f179448a25691495897149800c4261f6361d912cea3e8b9852b610bb82a56be
+  eslint-plugin-modules-newline: b1b8b4dc8763b015079153a6405a1ac4831320431e8446260a4029764e10ea3c
 
 importers:
 
@@ -202,7 +203,7 @@ importers:
         version: 3.0.2
       eslint-plugin-modules-newline:
         specifier: ^0.0.6
-        version: 0.0.6
+        version: 0.0.6(patch_hash=b1b8b4dc8763b015079153a6405a1ac4831320431e8446260a4029764e10ea3c)
       globals:
         specifier: ^17.12.0
         version: 17.12.0
@@ -2922,7 +2923,7 @@ snapshots:
       eslint: 10.11.0
       globals: 15.15.0
 
-  eslint-plugin-modules-newline@0.0.6:
+  eslint-plugin-modules-newline@0.0.6(patch_hash=b1b8b4dc8763b015079153a6405a1ac4831320431e8446260a4029764e10ea3c):
     dependencies:
       requireindex: 1.1.0
 

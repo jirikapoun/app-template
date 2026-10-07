@@ -1,0 +1,50 @@
+diff --git a/lib/rules/export-declaration-newline.js b/lib/rules/export-declaration-newline.js
+index 73e2183684f239106b7f88a9bb1ad82624b0ef3b..b70156cd630564b665479fdcf97bd703885123d9 100644
+--- a/lib/rules/export-declaration-newline.js
++++ b/lib/rules/export-declaration-newline.js
+@@ -2,6 +2,9 @@ const { EXPORT_NAMED } = require('../constants');
+ const { lintModuleVariablesNewline } = require('./utils');
+ 
+ module.exports = {
++  meta: {
++    fixable: 'whitespace',
++  },
+   create: function (context) {
+     return {
+       ExportNamedDeclaration(node) {
+diff --git a/lib/rules/import-declaration-newline.js b/lib/rules/import-declaration-newline.js
+index 8116203607e27bac352ec401fc33ecded9942771..2d1f290351ef6e50d1b0635877c789057a4b1c23 100644
+--- a/lib/rules/import-declaration-newline.js
++++ b/lib/rules/import-declaration-newline.js
+@@ -2,6 +2,9 @@ const { IMPORT } = require('../constants');
+ const { lintModuleVariablesNewline } = require('./utils');
+ 
+ module.exports = {
++  meta: {
++    fixable: 'whitespace',
++  },
+   create: function (context) {
+     return {
+       ImportDeclaration(node) {
+diff --git a/lib/rules/utils.js b/lib/rules/utils.js
+index 0490ac54b81c3d1503f016c4bd427ba23c2569cb..1ed7b9bcdef5036feba64691970d6ade7e8dd74e 100644
+--- a/lib/rules/utils.js
++++ b/lib/rules/utils.js
+@@ -11,7 +11,7 @@ function lintModuleVariablesNewline(node, context, moduleType) {
+   if (node.specifiers.length < 2) {
+     return null;
+   }
+-  const sourceCode = context.getSourceCode();
++  const sourceCode = context.sourceCode;
+   const moduleTypeNameForMessage = moduleType === IMPORT ? 'imported' : 'exported';
+ 
+   let moduleVariables = null;
+@@ -36,7 +36,7 @@ function lintModuleVariablesNewline(node, context, moduleType) {
+         fix: fixer,
+       });
+ 
+-      const sourceCode = context.getSourceCode();
++      const sourceCode = context.sourceCode;
+       const namedImportAfterDefault = moduleType === IMPORT
+         && node.specifiers[i].type === 'ImportSpecifier'
+         && (
