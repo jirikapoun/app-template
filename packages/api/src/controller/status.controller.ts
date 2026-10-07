@@ -1,17 +1,15 @@
-import { z } from '@hono/zod-openapi'
+import { Controller, route } from '@maveric/server'
 
 import statusRequests from '@app/schema/requests/status'
 import statusResponses from '@app/schema/responses/status'
 import StatusView from '@app/ui/view/StatusView'
-
-import Controller, { createRoute } from './index.js'
 
 
 const startTime = Date.now()
 
 const statusController = new Controller()
 
-  .endpoint(createRoute({
+  .endpoint(route({
     method: 'get',
     path: '',
     responses: {
@@ -25,7 +23,7 @@ const statusController = new Controller()
       uptime: Date.now() - startTime,
     }, 200))
 
-  .endpoint(createRoute({
+  .endpoint(route({
     method: 'post',
     path: '/test',
     request: {

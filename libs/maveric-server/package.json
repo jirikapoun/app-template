@@ -1,0 +1,27 @@
+{
+  "name": "@maveric/server",
+  "version": "0.0.1",
+  "description": "MVC-inspired framework for building full-stack applications and APIs",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@hono/zod-openapi": "^1.6.3"
+  },
+  "devDependencies": {
+    "@asteasolutions/zod-to-openapi": "^9.1.0",
+    "@maveric/client": "workspace:*",
+    "hono": "^4.13.8",
+    "typescript": "^7.0.2",
+    "zod": "^4.6.5"
+  }
+}

@@ -1,7 +1,9 @@
 {
   "extends": "./tsconfig.base.json",
   "include": [
+    "./*.ts",
     "./apps/*/src/*.ts",
+    "./libs/*/src/*.ts",
     "./packages/*/src/**/*.ts",
     "./packages/*/src/**/*.tsx"
   ],
@@ -14,7 +16,9 @@
       "@app/schema/requests/*": ["./packages/schema/src/requests/*.requests.ts"],
       "@app/schema/responses/*": ["./packages/schema/src/responses/*.responses.ts"],
       "@app/ui/*": ["./packages/ui/src/*.tsx"],
-      "@app/utils/*": ["./packages/utils/src/*.ts"]
+      "@app/utils/*": ["./packages/utils/src/*.ts"],
+      "@maveric/client": ["./libs/maveric-client/src/index.ts"],
+      "@maveric/server": ["./libs/maveric-server/src/index.ts"]
     }
   }
 }

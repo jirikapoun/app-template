@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-shadow */
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
 
 import type { ResponseConfig, ZodMediaTypeObject } from '@asteasolutions/zod-to-openapi'
 import type { ComputeInput, Hook, RouteConfig, RouteMiddlewareParams } from '@hono/zod-openapi'
+import type { View } from '@maveric/client'
 import type { TypedResponse } from 'hono'
 import type { Env, Handler, Input, MergePath, MiddlewareHandler, Schema, ToSchema } from 'hono/types'
 import type { ClientErrorStatusCode, InfoStatusCode, RedirectStatusCode, ServerErrorStatusCode, StatusCode, SuccessStatusCode } from 'hono/utils/http-status'
 import type { JSONParsed } from 'hono/utils/types'
 import type { z, ZodType } from 'zod'
-import type { View } from '@app/ui/view/index'
 
 
 type MaybePromise<T> = Promise<T> | T
@@ -26,14 +25,14 @@ type ExtractStatusCode<T extends RouteConfigStatusCode> = T extends keyof Status
 
 type RouteConfigToTypedResponse<R extends CustomRouteConfig> = {
   [Status in DefinedStatusCodes<R>]: ExtractStatusCode<Status> extends (infer Code extends StatusCode)
-    ? R['responses'][Status] extends { schema: infer Schema extends ZodType }
-      ? TypedResponse<JSONParsed<z.infer<Schema>>, Code, 'json'>
+    ? R['responses'][Status] extends { schema: infer ResponseSchema extends ZodType }
+      ? TypedResponse<JSONParsed<z.infer<ResponseSchema>>, Code, 'json'>
       : TypedResponse<null, Code, 'body'>
     : never
 }[DefinedStatusCodes<R>] | ('default' extends keyof R['responses']
   ? Exclude<StatusCode, ExtractStatusCode<DefinedStatusCodes<R>>> extends (infer Code extends StatusCode)
-    ? R['responses']['default'] extends { schema: infer Schema extends ZodType }
-      ? TypedResponse<JSONParsed<z.infer<Schema>>, Code, 'json'>
+    ? R['responses']['default'] extends { schema: infer ResponseSchema extends ZodType }
+      ? TypedResponse<JSONParsed<z.infer<ResponseSchema>>, Code, 'json'>
       : TypedResponse<null, Code, 'body'>
     : never
   : never
@@ -129,13 +128,14 @@ type CustomRouteConfigWithViews<R extends CustomRouteConfig> = R & {
   }
 }
 type ConvertPathType<T extends string> = T extends `${infer Start}/{${infer Param}}${infer Rest}` ? `${Start}/:${Param}${ConvertPathType<Rest>}` : T
-const customCreateRoute = createRoute as <P extends string, R extends Omit<CustomRouteConfig, 'path'> & {
+const route = createRoute as <P extends string, R extends Omit<CustomRouteConfig, 'path'> & {
   path: P
 }>(routeConfig: CustomRouteConfigWithViews<R>) => R & {
   getRoutingPath(): ConvertPathType<R['path']>
 }
 
 
-export default Controller
-
-export { customCreateRoute as createRoute }
+export {
+  Controller,
+  route,
+}

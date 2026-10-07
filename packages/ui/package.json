@@ -14,12 +14,12 @@
     }
   },
   "dependencies": {
+    "@maveric/client": "workspace:*",
     "hono": "^4.13.8",
     "react": "^19.3.0"
   },
   "devDependencies": {
     "@app/schema": "workspace:*",
-    "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "typescript": "^7.0.2",
     "zod": "^4.6.5"

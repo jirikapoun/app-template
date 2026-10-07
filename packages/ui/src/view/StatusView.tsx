@@ -1,4 +1,4 @@
-import view from './index.js'
+import { view } from '@maveric/client'
 
 import type statusResponses from '@app/schema/responses/status'
 

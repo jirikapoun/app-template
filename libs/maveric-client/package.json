@@ -1,0 +1,23 @@
+{
+  "name": "@maveric/client",
+  "version": "0.0.1",
+  "description": "MVC-inspired framework for building full-stack applications and APIs",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2",
+    "zod": "^4.6.5"
+  }
+}

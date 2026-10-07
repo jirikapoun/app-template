@@ -40,6 +40,6 @@ const view = <PropsSchema extends ZodType>(importMetaUrl: string, component: Syn
   return viewComponent
 }
 
-export default view
+export { view }
 
 export type { View }

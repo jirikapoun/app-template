@@ -16,16 +16,15 @@
     "@app/utils": "workspace:*",
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.6.3",
+    "@maveric/server": "workspace:*",
     "@types/react-dom": "^19.3.0",
     "hono": "^4.13.8",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
-    "@asteasolutions/zod-to-openapi": "^9.1.0",
     "@types/react": "^19.3.0",
-    "typescript": "^7.0.2",
-    "zod": "^4.6.5"
+    "typescript": "^7.0.2"
   },
   "private": true
 }

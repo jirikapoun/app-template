@@ -197,9 +197,11 @@ const eslintConfig = [
 
   // Other
   {
-    files: ['packages/api/src/controller/index.ts'],
+    files: ['libs/**/*.ts'],
     rules: {
       '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+      'consistent-default-export-name/default-export-match-filename': 'off',
+      'import/prefer-default-export': 'off',
     },
   },
 ]
