@@ -42,10 +42,19 @@ interface Payload {
 /** id of the <script type="application/json"> element containing the payload */
 const PAYLOAD_ELEMENT_ID = '__maveric'
 
+/** custom HMR events exchanged between the dev server and the browser runtime */
+const HMR_EVENTS = {
+  /** sent by the runtime once it has hydrated a view, so that it can be updated without reloading the page */
+  hydrated: 'maveric:hydrated',
+  /** sent by the dev server when modules used only on the server have changed */
+  serverUpdate: 'maveric:server-update',
+} as const
+
 const view = <PropsSchema extends ZodType>(component: SyncComponent<z.infer<PropsSchema>>) =>
   component as View<z.infer<PropsSchema>>
 
 export {
+  HMR_EVENTS,
   PAYLOAD_ELEMENT_ID,
   view,
 }

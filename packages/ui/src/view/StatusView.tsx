@@ -7,13 +7,19 @@ import type statusResponses from '@app/schema/responses/status'
 
 
 const StatusView = view<typeof statusResponses.getStatus>(({ uptime }) => {
-  // keeps counting in the browser once the view is hydrated
-  const [currentUptime, setCurrentUptime] = useState(uptime)
+  // the uptime keeps counting in the browser, starting from the last value received from the server
+  const [lastUpdate, setLastUpdate] = useState(() => ({ uptime, receivedAt: Date.now() }))
+  if (lastUpdate.uptime !== uptime) {
+    setLastUpdate({ uptime, receivedAt: Date.now() })
+  }
+
+  const [now, setNow] = useState(lastUpdate.receivedAt)
   useEffect(() => {
-    const startTime = Date.now() - uptime
-    const interval = setInterval(() => setCurrentUptime(Date.now() - startTime), 1000)
+    const interval = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(interval)
-  }, [uptime])
+  }, [])
+
+  const currentUptime = lastUpdate.uptime + Math.max(0, now - lastUpdate.receivedAt)
 
   return (
     <App title="Status">

@@ -1,7 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { HMR_EVENTS } from '@maveric/client'
 
-import type { Plugin as VitePlugin, ResolvedConfig, Rolldown, ViteDevServer } from 'vite'
+import type { ESTree, NormalizedHotChannelClient, Plugin as VitePlugin, ResolvedConfig, Rolldown, ViteDevServer } from 'vite'
 
 
 interface MavericOptions {
@@ -15,10 +16,28 @@ const RUNTIME_ID = '@maveric/client/runtime'
 
 const toPosixPath = (filePath: string) => filePath.replaceAll('\\', '/')
 
+// name of the variable exported as default, either by `export default name` or `export { name as default }`
+const findDefaultExportName = (program: ESTree.Program) => {
+  for (const node of program.body) {
+    if (node.type === 'ExportDefaultDeclaration' && node.declaration.type === 'Identifier') {
+      return node.declaration.name
+    }
+    if (node.type === 'ExportNamedDeclaration') {
+      const specifier = node.specifiers.find(({ exported }) => exported.type === 'Identifier' && exported.name === 'default')
+      if (specifier?.local.type === 'Identifier') {
+        return specifier.local.name
+      }
+    }
+  }
+  return null
+}
+
 const maveric = ({ views }: MavericOptions): VitePlugin => {
   const viewPatterns = Array.isArray(views) ? views : [views]
   let config: ResolvedConfig
   let server: ViteDevServer | undefined
+  // browser tabs connected to the dev server, mapped to whether they have hydrated a view
+  const clients = new Map<NormalizedHotChannelClient, boolean>()
 
   const isView = (file: string) => {
     const relativePath = toPosixPath(path.relative(config.root, file))
@@ -86,6 +105,28 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
       }
       devServer.watcher.on('add', invalidateManifest)
       devServer.watcher.on('unlink', invalidateManifest)
+
+      const { hot } = devServer.environments.client
+      hot.on('vite:client:connect', (_data, client) => clients.set(client, false))
+      hot.on('vite:client:disconnect', (_data, client) => clients.delete(client))
+      hot.on(HMR_EVENTS.hydrated, (_data, client) => clients.set(client, true))
+    },
+
+    // Fast Refresh only treats exports with a capitalized name or display name as components, but the views
+    // created by `view()` are anonymous functions, so they get the name of their module as the display name
+    transform(code, id) {
+      const file = id.split('?')[0]
+      if (!isView(file)) {
+        return null
+      }
+      const exportName = findDefaultExportName(this.parse(code))
+      if (!exportName) {
+        this.warn(`The default export of ${file} is not a variable, so it can't get a display name, which Fast Refresh may need`)
+        return null
+      }
+      const displayName = path.basename(file, path.extname(file))
+      // appending code doesn't move the existing code, so the source map stays valid
+      return { code: `${code}\n${exportName}.displayName ??= ${JSON.stringify(displayName)}\n`, map: null }
     },
 
     resolveId(id) {
@@ -117,15 +158,18 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
       ].join('\n')
     },
 
-    // modules used only on the server (controllers, schemas, ...) can't be hot-replaced in the browser,
+    // modules used only on the server (controllers, schemas, ...) can't be hot-replaced in the browser, tabs with
+    // a hydrated view re-render it with fresh props instead, other tabs (e.g. error pages) are reloaded,
     // modules loaded by the browser (views and their imports) are handled by the regular client-side HMR
     hotUpdate({ file, modules }) {
       if (this.environment.name !== 'ssr' || modules.length === 0 || !server) {
         return
       }
-      const client = server.environments.client
-      if (!client.moduleGraph.getModulesByFile(file)?.size) {
-        client.hot.send({ type: 'full-reload' })
+      if (server.environments.client.moduleGraph.getModulesByFile(file)?.size) {
+        return
+      }
+      for (const [client, hasHydratedView] of clients) {
+        client.send(hasHydratedView ? { type: 'custom', event: HMR_EVENTS.serverUpdate, data: { file } } : { type: 'full-reload' })
       }
     },
   }
