@@ -2,6 +2,7 @@ import { PAYLOAD_ELEMENT_ID } from '@maveric/client'
 import { accepts } from 'hono/accepts'
 import { createMiddleware } from 'hono/factory'
 import { matchedRoutes } from 'hono/route'
+import { COMPOSED_HANDLER } from 'hono/utils/constants'
 import React from 'react'
 import { renderToString } from 'react-dom/server'
 
@@ -38,13 +39,13 @@ const rendering = ({ manifest }: RenderingOptions) => createMiddleware(async (ct
     }
 
     const routes = matchedRoutes(ctx)
-    const lastRoute = routes[routes.length - 1]
-    if (!routeHasViews(lastRoute)) {
+    const views = findViews(routes[routes.length - 1])
+    if (!views) {
       // TODO at least log a warning that the route has no views defined
       return ctx.json(object, status, headers)
     }
 
-    const view = lastRoute.handler.views.get(status) as React.ComponentType<T & {}> | undefined
+    const view = views.get(status) as React.ComponentType<T & {}> | undefined
     if (!view) {
       // TODO at least log a warning that the route has no view defined for the given status code
       return ctx.json(object, status, headers)
@@ -69,9 +70,14 @@ const rendering = ({ manifest }: RenderingOptions) => createMiddleware(async (ct
   await next()
 })
 
-function routeHasViews(route: RouterRoute): route is RouterRoute & { handler: { views: Map<number, React.ComponentType> } } {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-  return Boolean((route.handler as any).views)
+// the views are attached to the route handler, which Hono wraps when the app is mounted into another one (`app.route()`)
+function findViews(route: RouterRoute) {
+  type Handler = { views?: Map<number, React.ComponentType>, [COMPOSED_HANDLER]?: Handler } | undefined
+  let handler = route.handler as Handler
+  while (handler && !handler.views) {
+    handler = handler[COMPOSED_HANDLER]
+  }
+  return handler?.views
 }
 
 // the client code is injected outside of the tree rendered by React, at the end of <head> and <body>,
