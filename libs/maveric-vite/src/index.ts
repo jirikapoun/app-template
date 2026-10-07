@@ -2,7 +2,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { HMR_EVENTS } from '@maveric/client'
 
-import type { ESTree, NormalizedHotChannelClient, Plugin as VitePlugin, ResolvedConfig, Rolldown, ViteDevServer } from 'vite'
+import type { ClientEntry } from '@maveric/client'
+import type { ESTree, Manifest, NormalizedHotChannelClient, Plugin as VitePlugin, ResolvedConfig, Rolldown, ViteDevServer } from 'vite'
 
 
 interface MavericOptions {
@@ -13,6 +14,7 @@ interface MavericOptions {
 const MANIFEST_ID = 'virtual:maveric/manifest'
 const RESOLVED_MANIFEST_ID = `\0${MANIFEST_ID}`
 const RUNTIME_ID = '@maveric/client/runtime'
+const VITE_MANIFEST_FILE = '.vite/manifest.json'
 
 const toPosixPath = (filePath: string) => filePath.replaceAll('\\', '/')
 
@@ -38,14 +40,16 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
   let server: ViteDevServer | undefined
   // browser tabs connected to the dev server, mapped to whether they have hydrated a view
   const clients = new Map<NormalizedHotChannelClient, boolean>()
+  // manifest of the client build, which the server build turns into the client manifest
+  let viteManifest: Manifest | undefined
 
   const isView = (file: string) => {
     const relativePath = toPosixPath(path.relative(config.root, file))
     return viewPatterns.some(pattern => path.matchesGlob(relativePath, pattern))
   }
 
-  const findViews = () => fs.globSync(viewPatterns, { cwd: config.root })
-    .map(file => toPosixPath(path.resolve(config.root, file)))
+  const findViews = (root: string) => fs.globSync(viewPatterns, { cwd: root })
+    .map(file => toPosixPath(path.resolve(root, file)))
     .sort()
 
   // URL under which the dev server serves the given file
@@ -53,6 +57,28 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
     const relativePath = path.relative(config.root, file)
     const isOutsideRoot = relativePath.startsWith('..') || path.isAbsolute(relativePath)
     return path.posix.join(config.base, isOutsideRoot ? `/@fs/${file}` : toPosixPath(relativePath))
+  }
+
+  // client entry of the given source file in the build, with all the chunks it imports and their stylesheets
+  const buildEntry = (manifest: Manifest, file: string): ClientEntry => {
+    const url = (outputFile: string) => path.posix.join(config.base, outputFile)
+    const key = toPosixPath(path.relative(config.root, file))
+    const preload = new Set<string>()
+    const css = new Set<string>()
+    const collect = (chunkKey: string) => {
+      const chunk = manifest[chunkKey]
+      if (preload.has(url(chunk.file))) {
+        return
+      }
+      preload.add(url(chunk.file))
+      chunk.css?.forEach(cssFile => css.add(url(cssFile)))
+      chunk.imports?.forEach(collect)
+    }
+    if (!(key in manifest)) {
+      throw new Error(`${key} is not an entry of the client build`)
+    }
+    collect(key)
+    return { url: url(manifest[key].file), preload: [...preload], css: [...css] }
   }
 
   // the runtime is resolved from a view, so that it comes from the same @maveric/client package the views use,
@@ -76,16 +102,76 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
 
   return {
     name: 'maveric',
+    // the client and the server environments are built separately, but they need to share the Vite manifest
+    sharedDuringBuild: true,
 
-    // let the dependency optimizer discover the views' dependencies before the first page load
-    config: () => ({
-      optimizeDeps: {
-        entries: viewPatterns,
-      },
-    }),
+    config: (userConfig, { command }) => {
+      if (command === 'serve') {
+        // let the dependency optimizer discover the views' dependencies before the first page load
+        return { optimizeDeps: { entries: viewPatterns } }
+      }
+      return {
+        // build all environments with `vite build`
+        builder: {},
+        environments: {
+          client: {
+            build: {
+              manifest: VITE_MANIFEST_FILE,
+              rolldownOptions: {
+                input: findViews(path.resolve(userConfig.root ?? '')),
+                // the runtime imports the views dynamically, so their exports need to be kept
+                preserveEntrySignatures: 'exports-only',
+              },
+            },
+          },
+        },
+      }
+    },
 
     configResolved(resolvedConfig) {
       config = resolvedConfig
+    },
+
+    // the server build needs the manifest of the client build
+    buildApp: {
+      order: 'pre',
+      async handler(builder) {
+        await builder.build(builder.environments.client)
+        for (const environment of Object.values(builder.environments)) {
+          if (!environment.isBuilt) {
+            // eslint-disable-next-line no-await-in-loop -- the environments are built one after another, like Vite does
+            await builder.build(environment)
+          }
+        }
+      },
+    },
+
+    async buildStart() {
+      if (config.command !== 'build' || this.environment.name !== 'client') {
+        return
+      }
+      const runtime = await resolveRuntime(this, findViews(config.root))
+      if (runtime) {
+        this.emitFile({ type: 'chunk', id: runtime, name: 'runtime' })
+      }
+    },
+
+    generateBundle: {
+      order: 'post',
+      handler(_options, bundle) {
+        if (this.environment.name !== 'client' || !(VITE_MANIFEST_FILE in bundle)) {
+          return
+        }
+        const manifestAsset = bundle[VITE_MANIFEST_FILE]
+        if (manifestAsset.type !== 'asset') {
+          return
+        }
+        viteManifest = JSON.parse(manifestAsset.source.toString()) as Manifest
+        // the manifest maps the source files to the built ones, so it's not published with the public files,
+        // the server gets the information it needs as part of its build
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete bundle[VITE_MANIFEST_FILE]
+      },
     },
 
     configureServer(devServer) {
@@ -137,23 +223,28 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
       if (id !== RESOLVED_MANIFEST_ID) {
         return null
       }
-      if (!server) {
-        this.error('Production builds are not supported yet')
-      }
 
-      const viewFiles = findViews()
+      const viewFiles = findViews(config.root)
       const runtime = await resolveRuntime(this, viewFiles)
-      const { head, body } = await devTags(server)
-      // nothing is preloaded in dev, the URLs wouldn't match anyway as Vite adds `?import` to dynamically imported modules
-      const entry = (file: string | null) => JSON.stringify({ url: file ? devUrl(file) : '', preload: [], css: [] })
+      let entry: (file: string) => ClientEntry
+      let tags = { head: '', body: '' }
+      if (server) {
+        tags = await devTags(server)
+        // nothing is preloaded in dev, the URLs wouldn't match anyway as Vite adds `?import` to dynamically imported modules
+        entry = file => ({ url: devUrl(file), preload: [], css: [] })
+      } else {
+        const manifest = viteManifest ?? this.error('The client environment needs to be built before the server environment')
+        entry = file => buildEntry(manifest, file)
+      }
+      const entryCode = (file: string | null) => JSON.stringify(file ? entry(file) : { url: '', preload: [], css: [] })
 
       return [
         ...viewFiles.map((file, index) => `import view${index} from ${JSON.stringify(file)}`),
         'export default {',
-        `  runtime: ${entry(runtime)},`,
-        `  views: new Map([${viewFiles.map((file, index) => `[view${index}, ${entry(file)}]`).join(', ')}]),`,
-        `  head: ${JSON.stringify(head)},`,
-        `  body: ${JSON.stringify(body)},`,
+        `  runtime: ${entryCode(runtime)},`,
+        `  views: new Map([${viewFiles.map((file, index) => `[view${index}, ${entryCode(file)}]`).join(', ')}]),`,
+        `  head: ${JSON.stringify(tags.head)},`,
+        `  body: ${JSON.stringify(tags.body)},`,
         '}',
       ].join('\n')
     },

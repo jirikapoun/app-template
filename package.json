@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "turbo build --filter=@maveric/vite --output-logs=errors-only && vite",
+    "build": "turbo build --filter=@maveric/vite --output-logs=errors-only && vite build",
+    "start": "node dist/server/index.js",
     "lint": "eslint ."
   },
   "devDependencies": {

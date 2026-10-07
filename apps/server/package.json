@@ -1,15 +1,14 @@
 {
   "name": "@app/server",
   "type": "module",
-  "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/index.js"
+    "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
     "@app/api": "workspace:*",
     "@app/utils": "workspace:*",
-    "@hono/node-server": "^2.1.1"
+    "@hono/node-server": "^2.1.1",
+    "hono": "^4.13.8"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
