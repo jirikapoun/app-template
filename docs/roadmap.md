@@ -8,7 +8,11 @@
 - **Cloudflare Workers.** A second deployment target next to the Node.js server; see [Deployment](deployment.md#cloudflare-workers-future).
 - **Standalone Maveric.** Moving `libs/` into its own repository, with an overarching `maveric` package bundling the framework packages for simpler projects. Its documentation is prepared in [`libs/maveric/README.md`](../libs/maveric/README.md).
 - **Verified documentation.** Following the READMEs and documents step by step, and checking that the resulting code compiles and works.
-- **Zero-warning baseline, enforced by git hooks.** Fix the known ESLint warnings (see [Tooling](tooling.md#eslint)) and keep the count at zero with `eslint --max-warnings 0` in a pre-commit hook, together with `commitlint` checking the commit messages in a `commit-msg` hook.
+- **Zero-warning baseline, enforced by `lint-staged`.** Fix the known ESLint warnings (see [Tooling](tooling.md#eslint)) and keep the count at zero by linting staged files with `eslint --max-warnings 0` in a pre-commit hook.
+- **Commit message checks with `commitlint`.** Enforce the commit message conventions (see [Tooling](tooling.md#git)) in a `commit-msg` hook.
+- **Generated configuration documentation.** Generate the configuration tables in the READMEs (such as the one in [`@app/utils`](../packages/utils/README.md#configuration)) from the Zod schemas defining the configuration, with [`@jackdbd/zod-to-doc`](https://www.npmjs.com/package/@jackdbd/zod-to-doc).
+- **Configuration structure.** Decide between a single configuration object for the whole application (as now, in `@app/utils`) and per-package configurations, where each package defines and validates its own configuration and `@app/utils` only provides the scaffolding for creating them. Both have benefits and drawbacks, so the decision needs deeper consideration.
+- **Views in the OpenAPI document.** HTML responses aren't described in the OpenAPI document yet (`Controller.endpoint()` adds an empty `text/html` content entry for routes with views). The idea is for `view()` to accept metadata, such as a description of the view, which `Controller.endpoint()` would pass into the OpenAPI document.
 
 ## Known limitations
 
