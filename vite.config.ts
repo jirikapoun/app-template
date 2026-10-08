@@ -4,11 +4,23 @@ import { defaultClientConditions, defaultServerConditions, defineConfig } from '
 
 import { maveric } from '@maveric/vite'
 
+import type { Plugin as VitePlugin } from 'vite'
+
+
+// building the root would bundle the sources of all packages, which is not how the production app is built
+const developmentOnly: VitePlugin = {
+  name: 'development-only',
+  apply: 'build',
+  config() {
+    throw new Error('The root Vite config is for development only, use `pnpm build` to build the packages for production')
+  },
+}
 
 // development server, which treats the whole project as a single package,
 // production builds are performed by the individual packages
 const viteConfig = defineConfig({
   plugins: [
+    developmentOnly,
     devServer({
       entry: './packages/api/src/index.ts',
       injectClientScript: false,
