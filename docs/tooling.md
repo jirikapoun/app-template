@@ -9,6 +9,7 @@
 | `pnpm start` | starts the production server at `http://localhost:3000` |
 | `pnpm lint` | runs ESLint on the whole project |
 | `pnpm typecheck` | type-checks the whole project as one program (TypeScript 6) |
+| `pnpm docs:check` | checks that all relative links in Markdown files point to existing files and headings (`scripts/check-docs.mjs`) |
 
 Every package has its own `build` script, which Turborepo runs; see [Workspace packages](workspace-packages.md#package-conventions).
 

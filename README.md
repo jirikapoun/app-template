@@ -45,6 +45,7 @@ pnpm start    # http://localhost:3000
 | `pnpm start` | starts the production server at `http://localhost:3000` |
 | `pnpm lint` | runs ESLint on the whole project |
 | `pnpm typecheck` | type-checks the whole project |
+| `pnpm docs:check` | checks the links in all Markdown files |
 
 ## Repository structure
 
@@ -62,6 +63,7 @@ libs/
 ├── maveric-server/  @maveric/server   controllers, rendering middleware
 └── maveric-vite/    @maveric/vite     Vite plugin
 docs/                                  technical documentation
+scripts/                               project scripts (documentation link check)
 ```
 
 Every package has its own README: [`@app/server`](apps/server/README.md), [`@app/api`](packages/api/README.md), [`@app/schema`](packages/schema/README.md), [`@app/ui`](packages/ui/README.md), [`@app/utils`](packages/utils/README.md), [`@maveric/client`](libs/maveric-client/README.md), [`@maveric/server`](libs/maveric-server/README.md), [`@maveric/vite`](libs/maveric-vite/README.md).
@@ -87,6 +89,7 @@ See [Architecture](docs/architecture.md) for details.
 | [Deployment](docs/deployment.md) | production artifact, configuration, Docker, Cloudflare Workers |
 | [Tooling](docs/tooling.md) | scripts, ESLint, formatting, editor, Git conventions |
 | [Roadmap](docs/roadmap.md) | planned features, known limitations |
+| [Documentation](docs/documentation.md) | structure, README formats, writing principles, keeping it up to date |
 
 ## Conventions
 

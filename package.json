@@ -7,7 +7,8 @@
     "build": "turbo build",
     "start": "pnpm --filter @app/server start",
     "lint": "eslint .",
-    "typecheck": "tsc6 -p tsconfig.json"
+    "typecheck": "tsc6 -p tsconfig.json",
+    "docs:check": "node scripts/check-docs.mjs"
   },
   "devDependencies": {
     "@eslint/config-helpers": "^0.7.0",
