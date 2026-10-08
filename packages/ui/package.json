@@ -10,9 +10,11 @@
       "import": "./dist/index.js"
     },
     "./App": {
+      "source": "./src/App.tsx",
       "import": "./dist/App.js"
     },
     "./view/*": {
+      "source": "./src/view/*.tsx",
       "import": "./dist/view/*.js"
     }
   },

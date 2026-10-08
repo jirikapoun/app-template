@@ -15,16 +15,8 @@
       "node",
       "vite/client"
     ],
-    "paths": {
-      "@app/api": ["./packages/api/src/index.ts"],
-      "@app/schema/requests/*": ["./packages/schema/src/requests/*.requests.ts"],
-      "@app/schema/responses/*": ["./packages/schema/src/responses/*.responses.ts"],
-      "@app/ui/*": ["./packages/ui/src/*.tsx"],
-      "@app/utils/*": ["./packages/utils/src/*.ts"],
-      "@maveric/client": ["./libs/maveric-client/src/index.ts"],
-      "@maveric/client/runtime": ["./libs/maveric-client/src/runtime.ts"],
-      "@maveric/server": ["./libs/maveric-server/src/index.ts"],
-      "@maveric/vite": ["./libs/maveric-vite/src/index.ts"]
-    }
+    "customConditions": [
+      "source"
+    ]
   }
 }

@@ -7,6 +7,7 @@
   },
   "exports": {
     "./*": {
+      "source": "./src/*.ts",
       "import": "./dist/*.js"
     }
   },

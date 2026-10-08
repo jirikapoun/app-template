@@ -8,9 +8,11 @@
   },
   "exports": {
     ".": {
+      "source": "./src/index.ts",
       "import": "./dist/index.js"
     },
     "./runtime": {
+      "source": "./src/runtime.ts",
       "import": "./dist/runtime.js"
     }
   },

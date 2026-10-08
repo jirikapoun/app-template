@@ -1,6 +1,6 @@
 import devServer, { defaultOptions } from '@hono/vite-dev-server'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defaultClientConditions, defaultServerConditions, defineConfig } from 'vite'
 
 import { maveric } from '@maveric/vite'
 
@@ -18,8 +18,9 @@ const viteConfig = defineConfig(({ command }) => ({
       views: 'packages/ui/src/view/**/*.tsx',
     }),
   ],
+  // workspace packages are resolved to their source files instead of their builds
   resolve: {
-    tsconfigPaths: true,
+    conditions: ['source', ...defaultClientConditions],
   },
   publicDir: 'packages/ui/public',
   environments: {
@@ -37,9 +38,12 @@ const viteConfig = defineConfig(({ command }) => ({
       },
     },
     ssr: {
-      // the built server is bundled with all its dependencies, so it runs without node_modules,
-      // while in dev, the dependencies are loaded from node_modules
-      ...command === 'build' ? { resolve: { noExternal: true } } : {},
+      resolve: {
+        conditions: ['source', ...defaultServerConditions],
+        // the built server is bundled with all its dependencies, so it runs without node_modules,
+        // while in dev, the dependencies are loaded from node_modules
+        ...command === 'build' ? { noExternal: true } : {},
+      },
       build: {
         outDir: 'dist/server',
         copyPublicDir: false,
