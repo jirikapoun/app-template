@@ -6,7 +6,8 @@
     "dev": "turbo build --filter=@maveric/vite --output-logs=errors-only && vite",
     "build": "turbo build --filter=@maveric/vite --output-logs=errors-only && vite build",
     "start": "node dist/server/index.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "typecheck": "tsc6 -p tsconfig.json"
   },
   "devDependencies": {
     "@eslint/config-helpers": "^0.7.0",
@@ -15,6 +16,7 @@
     "@strv/eslint-config-mocha": "^5.0.0",
     "@strv/eslint-config-node": "^5.0.0",
     "@strv/eslint-config-typescript": "^6.0.0",
+    "@types/node": "^26.6.4",
     "@vitejs/plugin-react": "^6.1.2",
     "eslint": "^10.11.0",
     "eslint-plugin-consistent-default-export-name": "^0.0.15",

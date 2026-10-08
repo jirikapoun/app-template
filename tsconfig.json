@@ -1,15 +1,19 @@
 {
   "extends": "./tsconfig.base.json",
   "include": [
-    "./*.ts",
-    "./apps/*/src/*.ts",
-    "./libs/*/src/*.ts",
-    "./packages/*/src/**/*.ts",
-    "./packages/*/src/**/*.tsx"
+    "*.ts",
+    "apps/*/*.ts",
+    "libs/*/*.ts",
+    "packages/*/*.ts",
+    "apps/*/src",
+    "libs/*/src",
+    "packages/*/src"
   ],
   "compilerOptions": {
+    "noEmit": true,
     "types": [
-      "node"
+      "node",
+      "vite/client"
     ],
     "paths": {
       "@app/api": ["./packages/api/src/index.ts"],

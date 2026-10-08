@@ -1,17 +1,10 @@
 {
-  "exclude": [
-    "**/node_modules",
-    "**/dist"
-  ],
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
     "strict": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "jsx": "react-jsx",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true
+    "jsx": "react-jsx"
   }
 }
