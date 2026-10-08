@@ -2,17 +2,20 @@
   "name": "@app/server",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json && vite build",
+    "start": "node --enable-source-maps dist/index.js"
   },
   "dependencies": {
     "@app/api": "workspace:*",
+    "@app/ui": "workspace:*",
     "@app/utils": "workspace:*",
     "@hono/node-server": "^2.1.1",
     "hono": "^4.13.8"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vite": "^8.3.3"
   },
   "private": true
 }

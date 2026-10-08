@@ -3,20 +3,18 @@
   "description": "UI layer of the application",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json"
+    "build": "rimraf dist && vite build && tsc -p tsconfig.build.json"
   },
   "exports": {
-    ".": {
-      "import": "./dist/index.js"
-    },
-    "./App": {
-      "source": "./src/App.tsx",
-      "import": "./dist/App.js"
+    "./manifest": {
+      "source": "./src/manifest.ts",
+      "import": "./dist/ssr/manifest.js"
     },
     "./view/*": {
       "source": "./src/view/*.tsx",
-      "import": "./dist/view/*.js"
-    }
+      "import": "./dist/ssr/view/*.js"
+    },
+    "./package.json": "./package.json"
   },
   "dependencies": {
     "@maveric/client": "workspace:*",
@@ -25,6 +23,7 @@
   },
   "devDependencies": {
     "@app/schema": "workspace:*",
+    "@maveric/vite": "workspace:*",
     "@types/react": "^19.3.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.3",

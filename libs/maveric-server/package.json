@@ -4,7 +4,7 @@
   "description": "MVC-inspired framework for building full-stack applications and APIs",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json"
+    "build": "rimraf dist && tsc -p tsconfig.build.json"
   },
   "exports": {
     ".": {

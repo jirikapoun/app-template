@@ -42,6 +42,8 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
   const clients = new Map<NormalizedHotChannelClient, boolean>()
   // manifest of the client build, which the server build turns into the client manifest
   let viteManifest: Manifest | undefined
+  // resolved by the client build, which bundles the runtime, as the server build may keep it external
+  let runtimeFile: string | null = null
 
   const isView = (file: string) => {
     const relativePath = toPosixPath(path.relative(config.root, file))
@@ -150,9 +152,9 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
       if (config.command !== 'build' || this.environment.name !== 'client') {
         return
       }
-      const runtime = await resolveRuntime(this, findViews(config.root))
-      if (runtime) {
-        this.emitFile({ type: 'chunk', id: runtime, name: 'runtime' })
+      runtimeFile = await resolveRuntime(this, findViews(config.root))
+      if (runtimeFile) {
+        this.emitFile({ type: 'chunk', id: runtimeFile, name: 'runtime' })
       }
     },
 
@@ -225,7 +227,7 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
       }
 
       const viewFiles = findViews(config.root)
-      const runtime = await resolveRuntime(this, viewFiles)
+      const runtime = server ? await resolveRuntime(this, viewFiles) : runtimeFile
       let entry: (file: string) => ClientEntry
       let tags = { head: '', body: '' }
       if (server) {

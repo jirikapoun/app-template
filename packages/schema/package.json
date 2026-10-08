@@ -3,7 +3,7 @@
   "description": "API schema definitions for client and server",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json"
+    "build": "rimraf dist && tsc -p tsconfig.build.json"
   },
   "exports": {
     "./requests/*": {

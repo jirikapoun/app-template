@@ -9,7 +9,7 @@ import config from '@app/utils/config'
 
 
 // the client build (runtime, views, public files) is located next to the server bundle
-const clientDir = path.join(import.meta.dirname, '../client')
+const clientDir = path.join(import.meta.dirname, 'client')
 
 const app = new Hono()
   .use(serveStatic({ root: clientDir }))

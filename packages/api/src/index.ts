@@ -3,8 +3,8 @@ import { OpenAPIHono } from '@hono/zod-openapi'
 import { rendering } from '@maveric/server'
 import { compress } from 'hono/compress'
 import { secureHeaders } from 'hono/secure-headers'
-import manifest from 'virtual:maveric/manifest'
 
+import manifest from '@app/ui/manifest'
 import config from '@app/utils/config'
 
 import statusController from './controller/status.controller.js'
