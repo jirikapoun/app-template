@@ -12,6 +12,7 @@
 - **Commit message checks with `commitlint`.** Enforce the commit message conventions (see [Tooling](tooling.md#git)) in a `commit-msg` hook.
 - **Generated configuration documentation.** Generate the configuration tables in the READMEs (such as the one in [`@app/utils`](../packages/utils/README.md#configuration)) from the Zod schemas defining the configuration, with [`@jackdbd/zod-to-doc`](https://www.npmjs.com/package/@jackdbd/zod-to-doc).
 - **Configuration structure.** Decide between a single configuration object for the whole application (as now, in `@app/utils`) and per-package configurations, where each package defines and validates its own configuration and `@app/utils` only provides the scaffolding for creating them. Both have benefits and drawbacks, so the decision needs deeper consideration.
+- **Minified responses.** Minifying the rendered pages, including the stylesheets inlined into them, could make them smaller. It needs prototyping and benchmarking first: responses already pass through the `compress()` middleware (`packages/api/src/index.ts`), so minifying them as well may save little, and its overhead on every request could make pages load slower in the end.
 - **Views in the OpenAPI document.** HTML responses aren't described in the OpenAPI document yet (`Controller.endpoint()` adds an empty `text/html` content entry for routes with views). The idea is for `view()` to accept metadata, such as a description of the view, which `Controller.endpoint()` would pass into the OpenAPI document.
 
 ## Known limitations
