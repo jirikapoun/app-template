@@ -74,7 +74,7 @@ The user values this process; follow it.
 
 Also:
 
-- **Commits:** one per step; a short, lowercase summary in the imperative mood (*enable Fast Refresh, refresh view props on server-side changes*). Refactors and fixes found along the way get their own commits. The user sometimes commits adjustments themselves: build on them, and squash only when asked, keeping their message (`git commit -C <commit>`).
+- **Commits:** one per step; a concise message as described in [Tooling](docs/tooling.md#git), naming the change rather than its details. Refactors and fixes found along the way get their own commits. The user sometimes commits adjustments themselves: build on them, and squash only when asked, keeping their message (`git commit -C <commit>`).
 - **Honesty:** correct earlier claims explicitly when they turn out wrong; mark untested things as untested; report failures with their output.
 - **Ideas the user mentions in passing** go into `docs/roadmap.md`.
 - **Confirm first:** deleting user files, installing global tools, anything leaving the repository.

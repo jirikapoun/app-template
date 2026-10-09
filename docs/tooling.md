@@ -38,5 +38,5 @@ The configuration is in `eslint.config.mjs` (flat config). It combines the share
 
 ## Git
 
-- **Commit messages** are a short, lowercase summary in the imperative mood, for example *enable Fast Refresh, refresh view props on server-side changes*.
+- **Commit messages** are a concise, lowercase summary in the imperative mood, for example *enable Fast Refresh, refresh view props on server-side changes*. They name the change, not its details, so that the log stays readable: up to about 65 characters.
 - **One logical change per commit.** Refactoring and fixes found along the way get their own commits.
