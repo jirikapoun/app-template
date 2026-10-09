@@ -58,9 +58,37 @@ const HMR_EVENTS = {
 const view = <PropsSchema extends ZodType>(component: SyncComponent<z.infer<PropsSchema>>) =>
   component as View<z.infer<PropsSchema>>
 
+// callbacks registered while a view is being rendered on the server, a module-level registry is enough,
+// because views are rendered synchronously, one at a time
+let insertedHtmlCallbacks: Array<() => string> | null = null
+
+/**
+ * Registers a callback returning HTML for the end of <head>, such as styles collected while rendering on the server.
+ * The callback runs once the view has been rendered; in the browser, nothing happens. Every call registers
+ * the callback, like Next.js' hook of the same name.
+ */
+const useServerInsertedHTML = (callback: () => string) => {
+  insertedHtmlCallbacks?.push(callback)
+}
+
+/** renders a view on the server, together with the HTML its components register with `useServerInsertedHTML()` */
+const renderWithInsertedHTML = (render: () => string) => {
+  const previousCallbacks = insertedHtmlCallbacks
+  const callbacks: Array<() => string> = []
+  insertedHtmlCallbacks = callbacks
+  try {
+    const html = render()
+    return { html, insertedHtml: callbacks.map(callback => callback()).join('') }
+  } finally {
+    insertedHtmlCallbacks = previousCallbacks
+  }
+}
+
 export {
   HMR_EVENTS,
   PAYLOAD_ELEMENT_ID,
+  renderWithInsertedHTML,
+  useServerInsertedHTML,
   view,
 }
 

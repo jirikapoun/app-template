@@ -1,4 +1,4 @@
-import { PAYLOAD_ELEMENT_ID } from '@maveric/client'
+import { PAYLOAD_ELEMENT_ID, renderWithInsertedHTML } from '@maveric/client'
 import { accepts } from 'hono/accepts'
 import { createMiddleware } from 'hono/factory'
 import { matchedRoutes } from 'hono/route'
@@ -58,7 +58,7 @@ const rendering = ({ manifest }: RenderingOptions) => createMiddleware(async (ct
 
     // views render the whole document, including <html>
     const viewElement = React.createElement(view, props)
-    const viewHtml = renderToString(viewElement)
+    const { html: viewHtml, insertedHtml } = renderWithInsertedHTML(() => renderToString(viewElement))
 
     const entry = manifest.views.get(view)
     if (!entry) {
@@ -67,12 +67,13 @@ const rendering = ({ manifest }: RenderingOptions) => createMiddleware(async (ct
     }
 
     const page = `<!DOCTYPE html>${viewHtml}`
+    const hydration = entry && { entry, props }
     if (entry && manifest.styles) {
       // during development, the dev server renders the view's stylesheets into the page
-      const html = manifest.styles(entry).then(styles => injectClientCode(page, manifest, { entry, props }, styles))
+      const html = manifest.styles(entry).then(styles => injectClientCode(page, manifest, { hydration, styles, insertedHtml }))
       return ctx.html(html, status, headers) as never
     }
-    return ctx.html(injectClientCode(page, manifest, entry && { entry, props }), status, headers) as never
+    return ctx.html(injectClientCode(page, manifest, { hydration, insertedHtml }), status, headers) as never
   })
   await next()
 })
@@ -87,10 +88,19 @@ function findViews(route: RouterRoute) {
   return handler?.views
 }
 
+interface ClientCode {
+  /** the view's client entry and props, unless the view can't be hydrated */
+  hydration?: { entry: ClientEntry, props: unknown }
+  /** the view's stylesheets, rendered by the dev server */
+  styles?: string
+  /** HTML registered by the view's components with `useServerInsertedHTML()` */
+  insertedHtml?: string
+}
+
 // the client code is injected outside of the tree rendered by React, at the end of <head> and <body>,
 // where React ignores it during hydration
-function injectClientCode(html: string, manifest: ClientManifest, view?: { entry: ClientEntry, props: unknown }, styles = '') {
-  const entries = view ? [manifest.runtime, view.entry] : []
+function injectClientCode(html: string, manifest: ClientManifest, { hydration, styles = '', insertedHtml = '' }: ClientCode) {
+  const entries = hydration ? [manifest.runtime, hydration.entry] : []
   const stylesheets = new Set(entries.flatMap(({ css }) => css))
   const preloads = new Set(entries.flatMap(({ preload }) => preload))
 
@@ -99,10 +109,12 @@ function injectClientCode(html: string, manifest: ClientManifest, view?: { entry
     styles,
     ...[...stylesheets].map(href => `<link rel="stylesheet" href="${escapeAttribute(href)}">`),
     ...[...preloads].map(href => `<link rel="modulepreload" href="${escapeAttribute(href)}">`),
+    // last, like the elements libraries insert into <head> in the browser, e.g. their runtime styles
+    insertedHtml,
   ]
   const body = [manifest.body]
-  if (view) {
-    const payload: Payload = { view: view.entry.url, props: view.props }
+  if (hydration) {
+    const payload: Payload = { view: hydration.entry.url, props: hydration.props }
     // `<` is escaped, so that the JSON can't close the <script> element
     const payloadJson = JSON.stringify(payload).replaceAll('<', '\\u003c')
     body.unshift(
