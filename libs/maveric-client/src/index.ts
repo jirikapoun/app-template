@@ -29,6 +29,11 @@ interface ClientManifest {
   head: string
   /** HTML to be injected at the end of <body> */
   body: string
+  /**
+   * HTML with the stylesheets of a view, to be injected at the end of <head>, only during development,
+   * where the entries have no `css`, so that the page is styled before its scripts run
+   */
+  styles?(entry: ClientEntry): Promise<string>
 }
 
 // data the server passes to the browser runtime to hydrate the rendered view

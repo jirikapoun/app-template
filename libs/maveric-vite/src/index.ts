@@ -1,9 +1,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { HMR_EVENTS } from '@maveric/client'
+import { isCSSRequest, isRunnableDevEnvironment } from 'vite'
 
 import type { ClientEntry } from '@maveric/client'
-import type { ESTree, Manifest, NormalizedHotChannelClient, Plugin as VitePlugin, ResolvedConfig, Rolldown, ViteDevServer } from 'vite'
+import type { EnvironmentModuleNode, ESTree, Manifest, NormalizedHotChannelClient, Plugin as VitePlugin, ResolvedConfig, Rolldown, ViteDevServer } from 'vite'
 
 
 interface MavericOptions {
@@ -15,8 +16,14 @@ const MANIFEST_ID = 'virtual:maveric/manifest'
 const RESOLVED_MANIFEST_ID = `\0${MANIFEST_ID}`
 const RUNTIME_ID = '@maveric/client/runtime'
 const VITE_MANIFEST_FILE = '.vite/manifest.json'
+// the manifest module runs in Vite's module runner, the global is how it reaches the plugin in the same process
+const DEV_STYLES_KEY = 'maveric:dev-styles'
+// stylesheets imported as URLs or strings, which aren't applied to the page
+const NON_PAGE_CSS_QUERY = /[?&](?:url|inline|raw)(?:[&=]|$)/u
 
 const toPosixPath = (filePath: string) => filePath.replaceAll('\\', '/')
+
+const escapeAttribute = (value: string) => value.replaceAll('&', '&amp;').replaceAll('"', '&quot;')
 
 // name of the variable exported as default, either by `export default name` or `export { name as default }`
 const findDefaultExportName = (program: ESTree.Program) => {
@@ -44,6 +51,8 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
   let viteManifest: Manifest | undefined
   // resolved by the client build, which bundles the runtime, as the server build may keep it external
   let runtimeFile: string | null = null
+  // view files by their URLs in the dev manifest
+  const viewFilesByUrl = new Map<string, string>()
 
   const isView = (file: string) => {
     const relativePath = toPosixPath(path.relative(config.root, file))
@@ -101,6 +110,45 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
       head: /<head>(?<content>[\s\S]*)<\/head>/u.exec(html)?.groups?.content.trim() ?? '',
       body: /<body>(?<content>[\s\S]*)<\/body>/u.exec(html)?.groups?.content.trim() ?? '',
     }
+  }
+
+  // stylesheets imported by a view, in import order, as <style> elements that the Vite client adopts by their
+  // `data-vite-dev-id` instead of injecting its own copies, and keeps up to date; the server module graph
+  // contains them, because the view has just been rendered
+  const devStyles = async (devServer: ViteDevServer, viewUrl: string) => {
+    const { ssr } = devServer.environments
+    const viewFile = viewFilesByUrl.get(viewUrl)
+    const viewModules = viewFile ? [...ssr.moduleGraph.getModulesByFile(viewFile) ?? []] : []
+    const viewModule = viewModules.find(({ id }) => id === viewFile) ?? viewModules.at(0)
+    if (!viewModule || !isRunnableDevEnvironment(ssr)) {
+      return ''
+    }
+
+    const stylesheets: EnvironmentModuleNode[] = []
+    const visited = new Set<EnvironmentModuleNode>()
+    const visit = (node: EnvironmentModuleNode) => {
+      if (visited.has(node)) {
+        return
+      }
+      visited.add(node)
+      if (node.id && isCSSRequest(node.id)) {
+        // the modules a stylesheet imports (`@import`, sources scanned by Tailwind) are part of it
+        if (!NON_PAGE_CSS_QUERY.test(node.id)) {
+          stylesheets.push(node)
+        }
+        return
+      }
+      node.importedModules.forEach(visit)
+    }
+    visit(viewModule)
+
+    const elements = await Promise.all(stylesheets.map(async ({ id, url }) => {
+      // the content is loaded on the server, as an extra module for the file in the browser module graph
+      // (`?inline`, `?direct`) would make Vite reload all pages when a CSS module changes
+      const { default: css } = await ssr.runner.import<{ default: string }>(`${url}${url.includes('?') ? '&' : '?'}inline`)
+      return `<style data-vite-dev-id="${escapeAttribute(id ?? '')}">${css.replace(/<\/style/giu, '<\\/style')}</style>`
+    }))
+    return elements.join('')
   }
 
   return {
@@ -195,6 +243,8 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
       devServer.watcher.on('add', invalidateManifest)
       devServer.watcher.on('unlink', invalidateManifest)
 
+      Object.assign(globalThis, { [Symbol.for(DEV_STYLES_KEY)]: async (viewUrl: string) => devStyles(devServer, viewUrl) })
+
       const { hot } = devServer.environments.client
       hot.on('vite:client:connect', (_data, client) => clients.set(client, false))
       hot.on('vite:client:disconnect', (_data, client) => clients.delete(client))
@@ -233,7 +283,9 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
       let tags = { head: '', body: '' }
       if (server) {
         tags = await devTags(server)
-        // nothing is preloaded in dev, the URLs wouldn't match anyway as Vite adds `?import` to dynamically imported modules
+        viewFiles.forEach(file => viewFilesByUrl.set(devUrl(file), file))
+        // nothing is preloaded in dev, the URLs wouldn't match anyway as Vite adds `?import` to dynamically imported modules,
+        // and the stylesheets are rendered into the page instead of linked
         entry = file => ({ url: devUrl(file), preload: [], css: [] })
       } else {
         const manifest = viteManifest ?? this.error('The client environment needs to be built before the server environment')
@@ -248,6 +300,7 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
         `  views: new Map([${viewFiles.map((file, index) => `[view${index}, ${entryCode(file)}]`).join(', ')}]),`,
         `  head: ${JSON.stringify(tags.head)},`,
         `  body: ${JSON.stringify(tags.body)},`,
+        ...server ? [`  styles: entry => globalThis[Symbol.for(${JSON.stringify(DEV_STYLES_KEY)})](entry.url),`] : [],
         '}',
       ].join('\n')
     },

@@ -21,14 +21,16 @@ interface RenderingOptions {
 
 type HeaderRecord = Record<'Content-Type', BaseMime> | Record<ResponseHeader, string | string[]> | Record<string, string | string[]>
 type JSONRespondReturn<T extends JSONValue | {} | InvalidJSONValue, U extends ContentfulStatusCode> = Response & TypedResponse<JSONParsed<T>, U, 'json'>
+// during development, pages are rendered asynchronously (Hono's own `c.render()` may be asynchronous too)
+type RenderReturn<T extends JSONValue | {} | InvalidJSONValue, U extends ContentfulStatusCode> = JSONRespondReturn<T, U> | Promise<JSONRespondReturn<T, U>>
 declare module 'hono' {
   interface ContextRenderer {
     // eslint-disable-next-line
-    <T extends JSONValue | {} | InvalidJSONValue, U extends ContentfulStatusCode = ContentfulStatusCode>(object: T, status: U, headers?: HeaderRecord): JSONRespondReturn<T, U>
+    <T extends JSONValue | {} | InvalidJSONValue, U extends ContentfulStatusCode = ContentfulStatusCode>(object: T, status: U, headers?: HeaderRecord): RenderReturn<T, U>
   }
 }
 const rendering = ({ manifest }: RenderingOptions) => createMiddleware(async (ctx, next) => {
-  ctx.setRenderer(<T extends JSONValue | {} | InvalidJSONValue, U extends ContentfulStatusCode = ContentfulStatusCode>(object: T, status: U, headers?: HeaderRecord): JSONRespondReturn<T, U> => {
+  ctx.setRenderer(<T extends JSONValue | {} | InvalidJSONValue, U extends ContentfulStatusCode = ContentfulStatusCode>(object: T, status: U, headers?: HeaderRecord): RenderReturn<T, U> => {
     const accept = accepts(ctx, {
       header: 'Accept',
       supports: ['text/html', 'application/json'],
@@ -64,8 +66,13 @@ const rendering = ({ manifest }: RenderingOptions) => createMiddleware(async (ct
       console.warn(`View ${view.displayName ?? view.name} is not listed in the client manifest, so it won't be hydrated`)
     }
 
-    const html = injectClientCode(`<!DOCTYPE html>${viewHtml}`, manifest, entry && { entry, props })
-    return ctx.html(html, status, headers) as never
+    const page = `<!DOCTYPE html>${viewHtml}`
+    if (entry && manifest.styles) {
+      // during development, the dev server renders the view's stylesheets into the page
+      const html = manifest.styles(entry).then(styles => injectClientCode(page, manifest, { entry, props }, styles))
+      return ctx.html(html, status, headers) as never
+    }
+    return ctx.html(injectClientCode(page, manifest, entry && { entry, props }), status, headers) as never
   })
   await next()
 })
@@ -82,13 +89,14 @@ function findViews(route: RouterRoute) {
 
 // the client code is injected outside of the tree rendered by React, at the end of <head> and <body>,
 // where React ignores it during hydration
-function injectClientCode(html: string, manifest: ClientManifest, view?: { entry: ClientEntry, props: unknown }) {
+function injectClientCode(html: string, manifest: ClientManifest, view?: { entry: ClientEntry, props: unknown }, styles = '') {
   const entries = view ? [manifest.runtime, view.entry] : []
   const stylesheets = new Set(entries.flatMap(({ css }) => css))
   const preloads = new Set(entries.flatMap(({ preload }) => preload))
 
   const head = [
     manifest.head,
+    styles,
     ...[...stylesheets].map(href => `<link rel="stylesheet" href="${escapeAttribute(href)}">`),
     ...[...preloads].map(href => `<link rel="modulepreload" href="${escapeAttribute(href)}">`),
   ]
