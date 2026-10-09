@@ -9,6 +9,7 @@ The repository is also the home and reference project of the Maveric framework, 
 - [Hono](https://hono.dev) with [`@hono/zod-openapi`](https://github.com/honojs/middleware/tree/main/packages/zod-openapi) and [Zod](https://zod.dev) — the API, its schemas and the OpenAPI document
 - [React 19](https://react.dev) — views, rendered on the server and hydrated in the browser
 - [PrimeReact 10](https://primereact.org) — UI components and their theme
+- [Tailwind CSS 4](https://tailwindcss.com) and [Iconify](https://iconify.design) — utility classes and icons
 - [Vite 8](https://vite.dev) with [Rolldown](https://rolldown.rs) — development server and production builds
 - [TypeScript](https://www.typescriptlang.org) 7 (and 6 for ESLint)
 - [pnpm](https://pnpm.io) workspaces and [Turborepo](https://turborepo.com)
@@ -88,6 +89,7 @@ See [Architecture](docs/architecture.md) for details.
 | [Server-side rendering and hydration](docs/rendering.md) | views, rendering middleware, client manifest, browser runtime |
 | [Hot reloading](docs/hot-reload.md) | Fast Refresh, refreshing pages after server-side changes |
 | [PrimeReact](docs/primereact.md) | integration, imports, server-rendered component styles (a patch) and their limits |
+| [Styling](docs/styling.md) | entry stylesheet and cascade layers, theme, Tailwind CSS, icons, browser support |
 | [Deployment](docs/deployment.md) | production artifact, configuration, Docker, Cloudflare Workers |
 | [Tooling](docs/tooling.md) | scripts, ESLint, formatting, editor, Git conventions |
 | [Roadmap](docs/roadmap.md) | planned features, known limitations |
@@ -97,6 +99,6 @@ See [Architecture](docs/architecture.md) for details.
 
 - Files use LF line endings and the formatting defined in `.editorconfig`.
 - ESLint checks the whole project, with type information; aim for zero warnings.
-- Commit messages are a short, lowercase summary in the imperative mood.
+- Commit messages are a concise, lowercase summary in the imperative mood.
 
 See [Tooling](docs/tooling.md).

@@ -6,11 +6,13 @@ The UI layer of the application: the views rendering API responses as HTML pages
 
 ```
 src/
-├── App.tsx        layout: the whole document (<html>, <head>, <body>), the PrimeReact provider, theme and style sheet
+├── App.tsx        layout: the whole document (<html>, <head>, <body>), the PrimeReact provider and style sheet
 ├── view/          views, one per file (StatusView.tsx, …)
+├── style/         stylesheets: main.css, the entry stylesheet with the theme and Tailwind CSS
 ├── manifest.ts    client manifest, re-exported for the server
 └── env.d.ts       ambient declaration of the virtual manifest module
 public/            public files (favicon.svg), served at the root URL
+tailwind-icons.ts  Tailwind plugin for the icon classes
 vite.config.ts     production build
 ```
 
@@ -47,6 +49,7 @@ export default StatusView
 - **Effects must survive Fast Refresh:** keep values that should persist in state, as `StatusView` does.
 - **Public files** are referenced by their URL (`/favicon.svg`), never imported.
 - **PrimeReact components** are imported from their module directory (`import { Inplace } from 'primereact/inplace'`), never from a file in it or from the package root; ESLint reports both and fixes the file imports the editor suggests. Their styles are part of the server-rendered page thanks to a patch of PrimeReact. See [PrimeReact](../../docs/primereact.md).
+- **Styles** are Tailwind utilities in the markup; colors that should follow the theme use the theme utilities (`bg-surface-card`, `text-primary`). Icons are classes too: `icon-[prime--refresh]` where PrimeIcons has the icon, `icon-[tabler--…]` otherwise. See [Styling](../../docs/styling.md).
 
 See [Server-side rendering and hydration](../../docs/rendering.md#views) and [Hot reloading](../../docs/hot-reload.md#requirements-for-views) for the reasons behind these rules.
 
@@ -58,7 +61,7 @@ See [Server-side rendering and hydration](../../docs/rendering.md#views) and [Ho
 
 `rimraf dist && vite build && tsc -p tsconfig.build.json`:
 
-1. Vite builds the `client` environment: the browser bundle with the runtime, the views and a `vendor` chunk, in `dist/client`;
+1. Vite builds the `client` environment: the browser bundle with the runtime, the views, a `vendor` chunk and the stylesheet, in `dist/client`, for the browsers listed in the root `package.json` (see [Styling](../../docs/styling.md#browser-support));
 2. Vite builds the `ssr` environment: the server-side modules (views, `App`, the manifest), one file per source module, in `dist/ssr`;
 3. `tsc` emits the type declarations into `dist/ssr`.
 
@@ -75,4 +78,5 @@ The package is built by Vite rather than `tsc` because it produces the browser b
 - [Server-side rendering and hydration](../../docs/rendering.md)
 - [Hot reloading](../../docs/hot-reload.md)
 - [Vite setup](../../docs/vite.md)
+- [Styling](../../docs/styling.md)
 - [PrimeReact](../../docs/primereact.md)

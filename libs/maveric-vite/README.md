@@ -73,6 +73,7 @@ The client manifest (`ClientManifest` from `@maveric/client`): for every view co
 
 - **Builds all environments** with `vite build`, the `client` environment first.
 - **Builds the browser bundle**: the runtime and every view become entries of the `client` environment.
+- **Targets the project's browsers:** with a [browserslist](https://github.com/browserslist/browserslist) configuration (a `browserslist` field in `package.json`, `.browserslistrc`, found from the Vite root upwards), the plugin sets the `build.target` of the `client` environment to the oldest version of each browser it lists, unless the configuration sets a target itself. Browsers Vite can't target, such as Samsung Internet, are left out; Chrome and Firefox for Android count as their desktop versions. Without a configuration, Vite's default applies.
 - **Generates the manifest for the server build** from the client build, with hashed URLs, preload lists and stylesheets. Vite's own manifest, which maps source files to built files, is removed from the browser bundle.
 
 The server build is configured by the application. In a single-package application, the `ssr` environment bundles the server entry, including the manifest. In a monorepo, the package containing the views can build its server-side modules as a library in the `ssr` environment and export the manifest from it.

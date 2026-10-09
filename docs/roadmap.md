@@ -14,6 +14,10 @@
 - **Configuration structure.** Decide between a single configuration object for the whole application (as now, in `@app/utils`) and per-package configurations, where each package defines and validates its own configuration and `@app/utils` only provides the scaffolding for creating them. Both have benefits and drawbacks, so the decision needs deeper consideration.
 - **Minified responses.** Minifying the rendered pages, including the stylesheets inlined into them, could make them smaller. It needs prototyping and benchmarking first: responses already pass through the `compress()` middleware (`packages/api/src/index.ts`), so minifying them as well may save little, and its overhead on every request could make pages load slower in the end.
 - **A fork of PrimeReact 10.** Keeping PrimeReact 10, the last open-source version, alive under a new name, with the patch rendering the component styles on the server as its foundation. Worth it if PrimeReact 10 stops being maintained, or the patch grows too large; its [limits](primereact.md#limits) are the starting points.
+- **A theme generator.** A PrimeReact theme generated from Lara at build time, with its hardcoded colors replaced by variables: any accent color, or a few presets, and a dark mode switched at runtime (see [Styling](styling.md#theme)). The accent colors of the precompiled Lara themes differ in 30 values, each mapping to exactly one value of another accent, so they can become variables mechanically. The dark themes differ in about 1,570 declarations without such a mapping, so the dark mode needs its own declarations, applied by a selector or a media query. The result is verifiable: filling the variables in must reproduce Lara's files. The generator could become a library of its own.
+- **Linting of the UI package.** A better linting setup for `@app/ui`, for example a Tailwind plugin for ESLint (unknown and conflicting classes), `eslint-plugin-compat` (browser APIs, checked against the browserslist targets) and Stylelint for stylesheets. Work on the ESLint configuration has started as a local work in progress (a WebStorm shelf, `.idea/shelf/eslint/shelved.patch`, outside version control).
+- **Polyfills.** Once the code needs JavaScript APIs the targeted browsers lack, it needs polyfills. `@vitejs/plugin-legacy` injects them through `index.html`, so server-rendered pages would have to get them through the client manifest (see [Styling](styling.md#browser-support)).
+- **Smaller fonts.** Lara ships Inter as variable fonts of 345 kB (regular) and 381 kB (italic, loaded only when used). Subsetting them, or using system fonts, would make the first page load faster.
 - **Views in the OpenAPI document.** HTML responses aren't described in the OpenAPI document yet (`Controller.endpoint()` adds an empty `text/html` content entry for routes with views). The idea is for `view()` to accept metadata, such as a description of the view, which `Controller.endpoint()` would pass into the OpenAPI document.
 
 ## Known limitations
@@ -41,6 +45,13 @@
 - The editor sees the ambient types of all environments (see [TypeScript configuration](typescript.md#ambient-types-are-declared-at-the-root)).
 - TypeScript 6 is kept next to TypeScript 7 until typescript-eslint supports the native compiler.
 - Adopting the stylesheets rendered into a page, Vite's client rewrites their content, so the fonts they reference are requested again; in Chrome 154 and later, `font-display: optional` fonts may stay in the fallback font ([Vite issue #23696](https://github.com/vitejs/vite/issues/23696)). The fix was merged after Vite 8.3.3; update Vite once it's released.
+
+### Styling
+
+- The theme's mode and accent color are chosen at build time, from Lara's two modes and eight accent colors (see [Styling](styling.md#theme)).
+- The theme is part of the application's stylesheet, so any change of the application's styles invalidates its cache too (about 180 kB minified).
+- Browser support was checked for the stylesheet as of October 2026; features without fallbacks, such as transparent theme colors (`bg-primary/50`), would need another check (see [Styling](styling.md#limits)).
+- During development, Tailwind keeps classes that are no longer used in the stylesheet until the dev server restarts.
 
 ### PrimeReact
 

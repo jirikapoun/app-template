@@ -25,7 +25,7 @@ From that single definition, the same URL answers API clients with JSON, documen
 - 🛡️ **End-to-end types:** the schema types the handler's return value and the view's props.
 - 💧 **Server-side rendering with hydration:** views render the whole document, styled from the first paint also during development, and hydrate in the browser with React 19.
 - 🔥 **Fast development:** React Fast Refresh for views, and pages that refresh in place with fresh data when server code changes.
-- 📦 **Optimized production builds** with Vite 8: hashed chunks, preloading, and a separately cached vendor chunk.
+- 📦 **Optimized production builds** with Vite 8: hashed chunks, preloading, a separately cached vendor chunk, and the browsers of your browserslist configuration as the target.
 - 🌍 **Runtime-agnostic API:** applications are [Hono](https://hono.dev) applications. Node.js is supported now, edge runtimes are planned.
 
 ## A minimal example

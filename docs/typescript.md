@@ -26,7 +26,7 @@ There are deliberately **no package-level `tsconfig.json` files** (see [below](#
 
 Only the compiler options that both contexts must agree on:
 
-- **`target: ESNext`** — the code is compiled for current runtimes; Vite takes care of browser compatibility of the client bundle.
+- **`target: ESNext`** — the code is compiled for current runtimes; Vite takes care of browser compatibility of the client bundle, for the browsers listed by browserslist (see [Styling](styling.md#browser-support)).
 - **`module: NodeNext`** — packages are ES modules (`"type": "module"`), so relative imports need explicit `.js` extensions, even when importing `.ts` or `.tsx` files (`import App from '../App.js'`).
 - **`strict: true`**.
 - **`verbatimModuleSyntax: true`** — imports used only as types must be written as `import type`, so that every compiler (TypeScript, Oxc in Vite) can remove them without type information.
@@ -37,7 +37,7 @@ Only the compiler options that both contexts must agree on:
 
 The root configuration covers the whole project as a single program, so that editors and linters see all packages at once, and changes propagate between packages immediately.
 
-- **`include`** covers the root-level `.ts` files (`vite.config.ts`), package-level `.ts` files (package Vite configs, `libs/maveric-vite/manifest.d.ts`) and the `src` directories of all packages. A file outside these patterns is neither type-checked nor linted with type information.
+- **`include`** covers the root-level `.ts` files (`vite.config.ts`), package-level `.ts` files (package Vite configs, `packages/ui/tailwind-icons.ts`, `libs/maveric-vite/manifest.d.ts`) and the `src` directories of all packages. A file outside these patterns is neither type-checked nor linted with type information.
 - **`noEmit: true`** — the development program is only checked, never compiled. Without it, `tsc -p tsconfig.json` would write `.js` files next to the sources.
 - **`customConditions: ["source"]`** — workspace packages resolve to their source files through the `source` condition of their `exports`, instead of their build outputs. See [Workspace packages](workspace-packages.md#the-source-export-condition).
 - **`types: ["node", "vite/client"]`** — the ambient types of all environments; see below.

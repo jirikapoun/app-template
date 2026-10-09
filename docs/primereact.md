@@ -9,8 +9,9 @@ PrimeReact 10 is the last version released under the MIT license, and it's in ma
 ## Integration
 
 - `@app/ui` depends on `primereact`.
-- `App.tsx` imports the theme (`primereact/resources/themes/lara-light-cyan/theme.css`), wraps the document in `PrimeReactProvider`, and passes it the style sheet collecting the component styles on the server (see [below](#wiring)).
-- The theme is an ordinary imported stylesheet: during development, the dev server renders it into the page; in production, the page links it from the client manifest (see [Server-side rendering and hydration](rendering.md#stylesheets-during-development)).
+- The entry stylesheet, `src/style/main.css`, imports the theme (`primereact/resources/themes/lara-light-cyan/theme.css`) and orders its cascade layer between Tailwind's preflight and utilities; its name selects the mode and the accent color (see [Styling](styling.md#theme)).
+- `App.tsx` imports the entry stylesheet, wraps the document in `PrimeReactProvider`, and passes it the style sheet collecting the component styles on the server (see [below](#wiring)).
+- The theme is part of an ordinary imported stylesheet: during development, the dev server renders it into the page; in production, the page links it from the client manifest (see [Server-side rendering and hydration](rendering.md#stylesheets-during-development)).
 - The structural styles of the components aren't part of the theme. `primereact/resources/primereact.min.css`, which contained them in earlier versions, is an empty, deprecated file since version 10; the components carry their styles themselves (see [below](#server-rendered-component-styles)).
 
 ## Imports
@@ -90,5 +91,6 @@ The following limits are known and accepted. They are also the starting points f
 ## See also
 
 - [Server-side rendering and hydration](rendering.md)
+- [Styling](styling.md)
 - [Tooling](tooling.md#eslint)
 - [`@app/ui`](../packages/ui/README.md)

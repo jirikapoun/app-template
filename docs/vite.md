@@ -21,6 +21,7 @@ All other packages are compiled by `tsc` (see [Workspace packages](workspace-pac
   - `injectClientScript: false`: the rendering middleware injects the client scripts itself (see [Server-side rendering and hydration](rendering.md#rendering-middleware)).
   - `exclude`: the plugin's middleware runs *before* Vite serves files, and passes every request to the Hono application unless it matches the `exclude` patterns or a file in the public directory. The default patterns cover URLs like `*.ts`, `*.tsx`, `*.css` or `/@…`, but not, for example, an imported image (`/packages/ui/src/logo.svg?import`), which the Hono application would answer with a 404. The configuration therefore adds `/^\/(?:packages|libs)\//`: all source files of the workspace are served by Vite.
 - **`@vitejs/plugin-react`** — React Fast Refresh. Its setup script is injected into pages by the rendering middleware, like the Vite client.
+- **`@tailwindcss/vite`** — Tailwind CSS: processes the entry stylesheet of `@app/ui`, generating the utilities its sources use. See [Styling](styling.md).
 - **`maveric({ views })`** from `@maveric/vite` — generates the client manifest, injects the development scripts and the views' stylesheets into pages, keeps views recognizable by Fast Refresh and refreshes pages after server-side changes. See [Server-side rendering and hydration](rendering.md#client-manifest) and [Hot reloading](hot-reload.md).
 
 ### Resolution
@@ -62,10 +63,11 @@ flowchart LR
 
 ### `@app/ui`
 
-`packages/ui/vite.config.ts` builds two [environments](https://vite.dev/guide/api-environment):
+`packages/ui/vite.config.ts` builds two [environments](https://vite.dev/guide/api-environment), with the `maveric` and `tailwindcss` plugins:
 
 - **`client`** — the browser bundle, in `dist/client`:
   - the runtime and every view are entries; the runtime is emitted as the `runtime` chunk;
+  - it's built for the browsers of the browserslist configuration in the root `package.json` (see [Styling](styling.md#browser-support));
   - React and other dependencies go into a separate `vendor` chunk (Rolldown's `output.codeSplitting` groups), which stays cached as long as the dependencies don't change;
   - the public files are copied into it;
   - file names keep the module names (`StatusView-[hash].js`), which helps when troubleshooting in the browser.
@@ -79,7 +81,7 @@ flowchart LR
 ```
 packages/ui/dist/
 ├── client/            browser bundle, served as static files
-│   ├── assets/        runtime-[hash].js, vendor-[hash].js, StatusView-[hash].js, …
+│   ├── assets/        runtime-[hash].js, vendor-[hash].js, StatusView-[hash].js and .css, fonts, …
 │   └── favicon.svg    public files
 └── ssr/               server-side modules (exports: ./manifest, ./view/*)
     ├── manifest.js    + .d.ts
@@ -91,6 +93,7 @@ packages/ui/dist/
 The `maveric` plugin coordinates the two builds:
 
 - it sets `builder: {}`, so that `vite build` builds all environments;
+- it sets the `build.target` of the `client` environment from the project's browserslist configuration, unless the configuration sets a target itself;
 - its `buildApp` hook builds the `client` environment first and then the others, because the `ssr` build needs the client manifest (when a hook builds an environment itself, Vite doesn't build the remaining ones, so the hook builds them all);
 - it captures Vite's manifest of the client build in memory and removes it from the output, because it maps source files to the built ones and doesn't belong to the public files;
 - it is `sharedDuringBuild`: Vite resolves the configuration separately for every environment, and only a shared plugin instance keeps the captured manifest between the builds;
