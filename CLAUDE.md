@@ -119,14 +119,13 @@ chrome-devtools stop
 - Before hydration: fetch the page (`Accept: text/html`), remove its `<script>` elements, save it as a temporary file in the public directory (`packages/ui/public`, or `client/` of the production copy), open it and compare it with the hydrated page (`chrome-devtools take_screenshot <id> --filePath …`).
 - The user may have the page open in their own browser with the Dark Reader extension: hydration warnings about `data-darkreader-*` in the dev server log come from that tab.
 
-## Environment pitfalls (Windows, PowerShell 5.1)
+## Environment pitfalls (Windows, PowerShell 7)
 
+- **Node.js version:** `node --version` must report 26. WebStorm starts the agent directly (`~\.jetbrains\acp.json`); started through `npx`, it ran on WebStorm's bundled Node.js 24, which then came first on the `PATH` the shell inherits, so everything pnpm runs used it too.
 - **Leftover Vite processes:** stopping a background `pnpm dev` can leave Vite running on port 5173, so the next server starts on 5174. After stopping, kill `node` processes whose command line matches `*app-template*vite.js*` and check `Get-NetTCPConnection -LocalPort 5173`.
-- **No `&&` in PowerShell 5.1:** use `;` or `if ($?) { … }`. In `package.json` scripts, `&&` works (they run in `cmd`).
-- **`Invoke-WebRequest` ignores a custom `Accept` header:** use `node --input-type=module -e "…fetch(…)…"`.
-- **`Out-File` and `Set-Content` write a BOM and CRLF:** use the Write tool, `[IO.File]::WriteAllText` with UTF-8 without BOM, or `git diff --output=…` for patches.
+- **`Out-File` and `Set-Content` write CRLF line endings:** use the Write tool, `[IO.File]::WriteAllText`, or `git diff --output=…` for patches.
 - **`Remove-Item` with wildcards** in paths can be blocked by the sandbox: resolve each path and use `-LiteralPath`.
-- **pnpm writes the command echo to stderr,** which PowerShell shows as `NativeCommandError` even on success: check `$LASTEXITCODE`. `Select-Object -First` on a node pipeline can produce exit code 255 (closed pipe), which is harmless.
+- **Redirected stderr** (`2>&1`) of native commands, such as pnpm's command echo, arrives as error records even on success: check `$LASTEXITCODE`.
 - **Scripts embedded in a PowerShell command** can trip the sandbox (a regular expression next to `Remove-Item` was taken for a path to remove): write longer scripts to a file in `%TEMP%` with the Write tool and run them with `node <file>`.
 - **Nested arrays unroll** in PowerShell (`@(@('a', 'b'))` is a flat array); prefer Node scripts for structured edits.
 
