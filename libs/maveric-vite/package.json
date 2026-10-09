@@ -19,6 +19,9 @@
     "dist",
     "manifest.d.ts"
   ],
+  "dependencies": {
+    "browserslist": "^4.29.3"
+  },
   "peerDependencies": {
     "@maveric/client": "workspace:*",
     "vite": "^8.3.3"

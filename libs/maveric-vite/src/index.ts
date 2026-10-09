@@ -1,10 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { HMR_EVENTS } from '@maveric/client'
+import browserslist from 'browserslist'
 import { isCSSRequest } from 'vite'
 
 import type { ClientEntry } from '@maveric/client'
-import type { DevEnvironment, EnvironmentModuleNode, ESTree, Manifest, NormalizedHotChannelClient, Plugin as VitePlugin, ResolvedConfig, Rolldown, RunnableDevEnvironment, ViteDevServer } from 'vite'
+import type { DevEnvironment, EnvironmentModuleNode, EnvironmentOptions, ESTree, Manifest, NormalizedHotChannelClient, Plugin as VitePlugin, ResolvedConfig, Rolldown, RunnableDevEnvironment, ViteDevServer } from 'vite'
 
 
 interface MavericOptions {
@@ -20,6 +21,17 @@ const VITE_MANIFEST_FILE = '.vite/manifest.json'
 const DEV_STYLES_KEY = 'maveric:dev-styles'
 // stylesheets imported as URLs or strings, which aren't applied to the page
 const NON_PAGE_CSS_QUERY = /[?&](?:url|inline|raw)(?:[&=]|$)/u
+// browsers that Vite's build targets support, by their browserslist names; mobile browsers count as their desktop versions
+const TARGET_BROWSERS: Partial<Record<string, string>> = {
+  chrome: 'chrome',
+  and_chr: 'chrome',
+  edge: 'edge',
+  firefox: 'firefox',
+  and_ff: 'firefox',
+  safari: 'safari',
+  ios_saf: 'ios',
+  opera: 'opera',
+}
 
 const toPosixPath = (filePath: string) => filePath.replaceAll('\\', '/')
 
@@ -28,6 +40,28 @@ const escapeAttribute = (value: string) => value.replaceAll('&', '&amp;').replac
 // Vite's `isRunnableDevEnvironment()` checks the class, which fails when the plugin gets another copy of Vite than
 // the dev server, as pnpm installs a variant of Vite for every set of its optional peer dependencies (`sass-embedded`, …)
 const isRunnable = (environment: DevEnvironment): environment is RunnableDevEnvironment => 'runner' in environment
+
+// build target for the oldest version of each browser the project's browserslist configuration lists,
+// or null without a configuration, leaving Vite's default
+const browserslistTarget = (root: string) => {
+  const query = browserslist.loadConfig({ path: root })
+  if (!query) {
+    return null
+  }
+  const oldest = new Map<string, { version: string, order: number }>()
+  for (const entry of browserslist(query, { path: root })) {
+    const [name, versions] = entry.split(' ')
+    const target = TARGET_BROWSERS[name]
+    // a range, such as `15.6-15.8`, counts as its first version
+    const version = versions.split('-')[0]
+    const [major, minor = 0] = version.split('.').map(Number)
+    const order = (major * 1000) + minor
+    if (target && !Number.isNaN(order) && order < (oldest.get(target)?.order ?? Infinity)) {
+      oldest.set(target, { version, order })
+    }
+  }
+  return oldest.size > 0 ? [...oldest].map(([target, { version }]) => `${target}${version}`) : null
+}
 
 // name of the variable exported as default, either by `export default name` or `export { name as default }`
 const findDefaultExportName = (program: ESTree.Program) => {
@@ -170,15 +204,20 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
         // let the dependency optimizer discover the views' dependencies before the first page load
         return { optimizeDeps: { entries: viewPatterns } }
       }
+      const root = path.resolve(userConfig.root ?? '')
+      const clientConfig: EnvironmentOptions | undefined = userConfig.environments?.client
+      // the browsers the browser bundle is built for (JavaScript by Oxc, CSS by Lightning CSS), an explicit target wins
+      const target = userConfig.build?.target ?? clientConfig?.build?.target ?? browserslistTarget(root)
       return {
         // build all environments with `vite build`
         builder: {},
         environments: {
           client: {
             build: {
+              ...target ? { target } : {},
               manifest: VITE_MANIFEST_FILE,
               rolldownOptions: {
-                input: findViews(path.resolve(userConfig.root ?? '')),
+                input: findViews(root),
                 // the runtime imports the views dynamically, so their exports need to be kept
                 preserveEntrySignatures: 'exports-only',
               },
