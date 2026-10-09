@@ -168,6 +168,8 @@ const eslintConfig = [
       'indent': 'off',
       'local-rules/no-default-export-object-shorthand': 'warn',
       'local-rules/padding-line-between-default-export-object-properties': ['warn', { ignoreSingleLineProperties: true }],
+      // TypeScript 7 auto-imports these as files (`primereact/inplace/inplace.js`), often a browser global build
+      'local-rules/prefer-package-directory-imports': ['error', { packages: ['primereact'] }],
       'max-params': ['warn', 5],
       'modules-newline/export-declaration-newline': 'warn',
       'no-empty-function': ['warn', { allow: ['methods'] }],

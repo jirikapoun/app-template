@@ -85,7 +85,7 @@ Each package has a minimal `tsconfig.build.json` that extends the shared one and
 | `@maveric/client` | `types: ["vite/client"]` | the runtime uses `import.meta.hot` |
 | `@maveric/vite` | `types: ["node"]` | a Vite plugin runs in Node.js |
 | `@app/utils` | `types: ["node"]` | reads `process.env` |
-| `@app/ui` | `outDir: ./dist/ssr`, `emitDeclarationOnly` | Vite compiles the JavaScript; `tsc` only adds declarations next to it |
+| `@app/ui` | `outDir: ./dist/ssr`, `emitDeclarationOnly`, `types: ["vite/client"]` | Vite compiles the JavaScript; `tsc` only adds declarations next to it. Views import stylesheets, whose module declarations come from Vite's client types |
 | `@app/server` | `types: ["node"]`, `noEmit` | Vite bundles the server; `tsc` only type-checks it |
 | others | — | |
 

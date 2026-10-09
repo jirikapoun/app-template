@@ -21,6 +21,7 @@ The configuration is in `eslint.config.mjs` (flat config). It combines the share
 - **TypeScript 6.** typescript-eslint uses the JavaScript API of the TypeScript compiler, which the native TypeScript 7 doesn't have. That's why the root package's `typescript` dependency is TypeScript 6 (see [TypeScript configuration](typescript.md#typescript-versions)).
 - **Patched dependencies.** Some of the shared configurations and plugins are patched to work with the current versions of ESLint and its plugins; the patches are in `patches/`, registered in `pnpm-workspace.yaml`.
 - **Unused disable comments** are reported (`reportUnusedDisableDirectives`), so an `eslint-disable` comment must stay justified.
+- **Local rules** (`eslint-local-rules.cjs`) cover what no plugin does. `prefer-package-directory-imports` is an auto-fixable error for packages without `exports` whose modules are directories, configured for `primereact`: it turns `primereact/inplace/inplace.js` into `primereact/inplace`. The files in such a directory are builds for different environments; `inplace.js` is a browser script expecting a global `React`, and fails with *React is not defined* when imported.
 - **Import order.** Two rules check the order of imports (`import/order` and `import-x/order`); where they seem to disagree about workspace packages, follow their messages. Imports without bindings (`import './production.js'`) are never reordered.
 - **Warnings.** The target is zero warnings, to be enforced by git hooks (see [Roadmap](roadmap.md#planned)). Until then, the project has 12 known warnings, most of them `TODO` comments and `console` calls in code that will change; keep this number up to date, and fix new warnings rather than adding to the list.
 
@@ -32,6 +33,7 @@ The configuration is in `eslint.config.mjs` (flat config). It combines the share
 ## Editor
 
 - **WebStorm** is set to its bundled TypeScript-Go 7 language service, which uses the root `tsconfig.json`. Thanks to the `source` condition, navigating to a workspace import opens its source file.
+- **TypeScript 7 auto-imports modules of packages without `exports` by their file name:** `primereact/inplace/inplace.js` rather than `primereact/inplace`, which TypeScript 6 suggests. The `prefer-package-directory-imports` rule (see [ESLint](#eslint)) fixes such imports, and WebStorm runs ESLint fixes on save (`.idea/jsLinters/eslint.xml`), so they are corrected as soon as the file is saved.
 - **Diagnostics of the TypeScript-Go service aren't part of WebStorm's inspection results.** Tools that read those results (for example, assistants connected through the IDE's MCP server) don't see TypeScript errors. Use `pnpm typecheck` to check the project.
 
 ## Git

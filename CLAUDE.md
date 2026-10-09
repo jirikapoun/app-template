@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-A full-stack TypeScript application template built on Maveric, an MVC-inspired framework developed in `libs/` of the same repository. Routes define a Zod schema, a handler and optionally a React view; the same URL answers JSON or a server-rendered page hydrated in the browser. Stack: Hono + `@hono/zod-openapi`, React 19, Vite 8 (Rolldown, Oxc), TypeScript 7 (+6 for ESLint), pnpm workspaces, Turborepo, Node.js 26, Windows development machine.
+A full-stack TypeScript application template built on Maveric, an MVC-inspired framework developed in `libs/` of the same repository. Routes define a Zod schema, a handler and optionally a React view; the same URL answers JSON or a server-rendered page hydrated in the browser. Stack: Hono + `@hono/zod-openapi`, React 19, PrimeReact 10, Vite 8 (Rolldown, Oxc), TypeScript 7 (+6 for ESLint), pnpm workspaces, Turborepo, Node.js 26, Windows development machine.
 
 The documentation is extensive; read the relevant file before changing an area:
 
@@ -47,6 +47,7 @@ There are no tests yet. Useful URLs in dev: `/status` (page, or JSON with `Accep
 - **`@maveric/vite` is loaded from its build** when Vite reads its config: after changing it, rebuild it (or restart `pnpm dev`).
 - **Views:** component as the first argument of `view()`, the only export, `export default <Name>`; browser-safe imports; deterministic first render; render the whole document via `App`.
 - **`ctx.render()` requires the status**; the view is chosen by it.
+- **PrimeReact imports** name the module directory (`primereact/inplace`), never a file in it; TypeScript 7 auto-imports suggest files, a local ESLint rule fixes them (see [docs/tooling.md](docs/tooling.md#editor)).
 - **`@hono/vite-dev-server` intercepts URLs** not matching its `exclude` patterns; source URLs must stay excluded.
 - **TypeScript 6 crashes** on path mappings with several extension-specific fallbacks.
 

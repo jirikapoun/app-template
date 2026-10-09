@@ -8,6 +8,7 @@ The repository is also the home and reference project of the Maveric framework, 
 
 - [Hono](https://hono.dev) with [`@hono/zod-openapi`](https://github.com/honojs/middleware/tree/main/packages/zod-openapi) and [Zod](https://zod.dev) — the API, its schemas and the OpenAPI document
 - [React 19](https://react.dev) — views, rendered on the server and hydrated in the browser
+- [PrimeReact 10](https://primereact.org) — UI components and their theme
 - [Vite 8](https://vite.dev) with [Rolldown](https://rolldown.rs) — development server and production builds
 - [TypeScript](https://www.typescriptlang.org) 7 (and 6 for ESLint)
 - [pnpm](https://pnpm.io) workspaces and [Turborepo](https://turborepo.com)

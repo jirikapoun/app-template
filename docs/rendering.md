@@ -172,6 +172,6 @@ That's the main reason `@app/ui` is built by Vite instead of `tsc`: the manifest
 - One view per response; views render synchronously with `renderToString` (no streaming, no async components).
 - The view is chosen by the status passed to `ctx.render()`; a status set only by `ctx.status()` isn't taken into account.
 - Missing views fall back to JSON silently (see the TODOs in the middleware).
-- Stylesheets imported by views are part of the manifest in production, but this hasn't been exercised yet.
+- During development, stylesheets imported by views aren't part of the rendered page; Vite applies them only once the JavaScript runs.
 
 See also [Roadmap](roadmap.md).

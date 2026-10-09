@@ -6,7 +6,7 @@ The UI layer of the application: the views rendering API responses as HTML pages
 
 ```
 src/
-├── App.tsx        layout: the whole document (<html>, <head>, <body>)
+├── App.tsx        layout: the whole document (<html>, <head>, <body>), the PrimeReact provider and theme
 ├── view/          views, one per file (StatusView.tsx, …)
 ├── manifest.ts    client manifest, re-exported for the server
 └── env.d.ts       ambient declaration of the virtual manifest module
@@ -46,6 +46,7 @@ export default StatusView
 - **Views run in the browser too:** import only browser-safe code (type-only imports of schemas are fine), and keep the first render deterministic (no `Date.now()`, `Math.random()` or locale formatting).
 - **Effects must survive Fast Refresh:** keep values that should persist in state, as `StatusView` does.
 - **Public files** are referenced by their URL (`/favicon.svg`), never imported.
+- **PrimeReact components** are imported from their module directory (`import { Inplace } from 'primereact/inplace'`), never from a file in it; ESLint fixes the file imports the editor suggests (see [Tooling](../../docs/tooling.md#editor)).
 
 See [Server-side rendering and hydration](../../docs/rendering.md#views) and [Hot reloading](../../docs/hot-reload.md#requirements-for-views) for the reasons behind these rules.
 

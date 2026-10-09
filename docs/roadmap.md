@@ -21,7 +21,7 @@
 - One view per response, rendered synchronously with `renderToString`: no streaming, no async components.
 - The view is chosen by the status passed to `ctx.render()`; a status set only by `ctx.status()` isn't taken into account.
 - When a route has no view, or none for the status, the middleware responds with JSON without any warning (see the `TODO`s in `libs/maveric-server/src/rendering.ts`).
-- Stylesheets imported by views are part of the client manifest in production, but this hasn't been exercised yet. During development, Vite applies them only once the JavaScript runs.
+- During development, stylesheets imported by views aren't part of the rendered page; Vite applies them only once the JavaScript runs, so pages show unstyled content first. In production, they are linked from the client manifest.
 - Regenerating the client manifest when a view file is added or removed is implemented, but hasn't been exercised yet.
 - Browser extensions that add attributes to `<html>` or `<body>` cause hydration warnings in development; this is by design (see [Server-side rendering and hydration](rendering.md#hydration-consistency)).
 
