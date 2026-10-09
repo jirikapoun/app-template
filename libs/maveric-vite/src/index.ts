@@ -1,10 +1,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { HMR_EVENTS } from '@maveric/client'
-import { isCSSRequest, isRunnableDevEnvironment } from 'vite'
+import { isCSSRequest } from 'vite'
 
 import type { ClientEntry } from '@maveric/client'
-import type { EnvironmentModuleNode, ESTree, Manifest, NormalizedHotChannelClient, Plugin as VitePlugin, ResolvedConfig, Rolldown, ViteDevServer } from 'vite'
+import type { DevEnvironment, EnvironmentModuleNode, ESTree, Manifest, NormalizedHotChannelClient, Plugin as VitePlugin, ResolvedConfig, Rolldown, RunnableDevEnvironment, ViteDevServer } from 'vite'
 
 
 interface MavericOptions {
@@ -24,6 +24,10 @@ const NON_PAGE_CSS_QUERY = /[?&](?:url|inline|raw)(?:[&=]|$)/u
 const toPosixPath = (filePath: string) => filePath.replaceAll('\\', '/')
 
 const escapeAttribute = (value: string) => value.replaceAll('&', '&amp;').replaceAll('"', '&quot;')
+
+// Vite's `isRunnableDevEnvironment()` checks the class, which fails when the plugin gets another copy of Vite than
+// the dev server, as pnpm installs a variant of Vite for every set of its optional peer dependencies (`sass-embedded`, …)
+const isRunnable = (environment: DevEnvironment): environment is RunnableDevEnvironment => 'runner' in environment
 
 // name of the variable exported as default, either by `export default name` or `export { name as default }`
 const findDefaultExportName = (program: ESTree.Program) => {
@@ -120,7 +124,12 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
     const viewFile = viewFilesByUrl.get(viewUrl)
     const viewModules = viewFile ? [...ssr.moduleGraph.getModulesByFile(viewFile) ?? []] : []
     const viewModule = viewModules.find(({ id }) => id === viewFile) ?? viewModules.at(0)
-    if (!viewModule || !isRunnableDevEnvironment(ssr)) {
+    if (!viewModule) {
+      ssr.logger.warnOnce(`[plugin:maveric] The page of ${viewUrl} is rendered without its stylesheets, because the view isn't in the module graph of the ssr environment`)
+      return ''
+    }
+    if (!isRunnable(ssr)) {
+      ssr.logger.warnOnce('[plugin:maveric] Pages are rendered without their stylesheets, because the ssr environment can\'t run modules')
       return ''
     }
 

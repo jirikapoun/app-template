@@ -64,7 +64,7 @@ The client manifest (`ClientManifest` from `@maveric/client`): for every view co
 
 - **Generates the manifest** with the source URLs of the views and the runtime, and regenerates it when view files are added or removed (not exercised yet).
 - **Collects the scripts Vite and its plugins inject into pages** (the Vite client, the React Refresh setup) by running `transformIndexHtml()` on an empty document, and passes them to the rendering middleware through the manifest.
-- **Renders the stylesheets a view imports into the page**, so that it's styled before its scripts run. They're `<style data-vite-dev-id>` elements, which Vite's client adopts and keeps up to date instead of injecting its own copies.
+- **Renders the stylesheets a view imports into the page**, so that it's styled before its scripts run. They're `<style data-vite-dev-id>` elements, which Vite's client adopts and keeps up to date instead of injecting its own copies. The stylesheets are loaded with the module runner of the `ssr` environment; if it can't run modules, pages are rendered without them, and the plugin logs a warning.
 - **Sets a display name on every view** (the file name), so that React Fast Refresh recognizes views as components. Views must be exported as default, as a variable.
 - **Refreshes pages after server-side changes.** When a module used only on the server changes, tabs with a hydrated view re-render it with fresh props, without reloading; other tabs reload.
 - **Lets the dependency optimizer discover the views' dependencies** before the first page load.
