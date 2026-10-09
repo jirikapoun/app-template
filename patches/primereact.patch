@@ -1,0 +1,244 @@
+diff --git a/api/api.cjs.js b/api/api.cjs.js
+index e2812f79688e992ba3fe4af5714296488a12d3ba..b695ab5ddeb98f6cb7f37896ec452a9f1b224248 100644
+--- a/api/api.cjs.js
++++ b/api/api.cjs.js
+@@ -972,6 +972,31 @@ function _slicedToArray(r, e) {
+ }
+ 
+ var PrimeReactContext = /*#__PURE__*/React__default["default"].createContext();
++// patched: collects the styles of the components rendered on the server, to be sent with the page as <style>
++// elements, which the components find by their data-primereact-style-id and reuse instead of inserting new ones
++var escapeAttribute = function escapeAttribute(value) {
++  return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
++};
++var PrimeReactStyleSheet = /*#__PURE__*/function () {
++  function PrimeReactStyleSheet() {
++    this.styles = new Map();
++  }
++  PrimeReactStyleSheet.prototype.add = function add(name, css, nonce) {
++    if (!this.styles.has(name)) {
++      this.styles.set(name, { css: css, nonce: nonce });
++    }
++  };
++  PrimeReactStyleSheet.prototype.toString = function toString() {
++    var html = '';
++    this.styles.forEach(function (style, name) {
++      var nonce = style.nonce ? ' nonce="' + escapeAttribute(style.nonce) + '"' : '';
++      html += '<style data-primereact-style-id="' + escapeAttribute(name) + '"' + nonce + '>' + style.css.replace(/<\/style/gi, '<\\/style') + '</style>';
++    });
++    return html;
++  };
++  return PrimeReactStyleSheet;
++}();
++
+ var PrimeReactProvider = function PrimeReactProvider(props) {
+   var _props$value, _propsValue$ripple, _propsValue$inputStyl, _propsValue$locale, _propsValue$appendTo, _propsValue$styleCont, _propsValue$cssTransi, _propsValue$autoZInde, _propsValue$hideOverl, _propsValue$nonce, _propsValue$nullSortO, _propsValue$zIndex, _propsValue$ptOptions, _propsValue$pt, _propsValue$unstyled, _propsValue$filterMat;
+   var propsValue = (_props$value = props.value) !== null && _props$value !== void 0 ? _props$value : {};
+@@ -1118,7 +1143,8 @@ var PrimeReactProvider = function PrimeReactProvider(props) {
+     filterMatchModeOptions: filterMatchModeOptions,
+     setFilterMatchModeOptions: setFilterMatchModeOptions,
+     unstyled: unstyled,
+-    setUnstyled: setUnstyled
++    setUnstyled: setUnstyled,
++    styleSheet: propsValue.styleSheet
+   };
+   return /*#__PURE__*/React__default["default"].createElement(PrimeReactContext.Provider, {
+     value: value
+@@ -1134,6 +1160,7 @@ exports.MessageSeverity = MessageSeverity;
+ exports.PrimeIcons = PrimeIcons;
+ exports.PrimeReactContext = PrimeReactContext;
+ exports.PrimeReactProvider = PrimeReactProvider;
++exports.PrimeReactStyleSheet = PrimeReactStyleSheet;
+ exports.SortOrder = SortOrder;
+ exports.addLocale = addLocale;
+ exports.ariaLabel = ariaLabel;
+diff --git a/api/api.d.ts b/api/api.d.ts
+index 16b37feed3694c6a451dd8668cda762498e7c26b..bc65894ee6bd043fe7f78e351733cc12226eb829 100644
+--- a/api/api.d.ts
++++ b/api/api.d.ts
+@@ -227,6 +227,10 @@ export interface APIOptions {
+      * @defaultValue false
+      */
+     unstyled?: boolean;
++    /**
++     * Collects the styles of the components rendered on the server (patched).
++     */
++    styleSheet?: PrimeReactStyleSheet;
+     /**
+      * This method is used to change the theme dynamically.
+      * @param {string} currentTheme - The name of the current theme. Example 'lara-light-blue'
+@@ -698,6 +702,16 @@ type PrimeReactProviderProps = {
+ 
+ declare const PrimeReactProvider: React.FC<PrimeReactProviderProps>;
+ declare const PrimeReactContext: React.Context<APIOptions>;
++/**
++ * Collects the styles of the components rendered on the server, to be sent with the page (patched).
++ */
++export declare class PrimeReactStyleSheet {
++    add(name: string, css: string, nonce?: string): void;
++    /**
++     * The collected styles as <style> elements.
++     */
++    toString(): string;
++}
+ 
+ export { PrimeReactContext, PrimeReactProvider };
+ 
+diff --git a/api/api.esm.js b/api/api.esm.js
+index 5e8876f1cd869d0c6f21513e22021955e10a442a..55f4a2f12f96d17bd26e5561bce340fe0c6202d6 100644
+--- a/api/api.esm.js
++++ b/api/api.esm.js
+@@ -964,6 +964,31 @@ function _slicedToArray(r, e) {
+ }
+ 
+ var PrimeReactContext = /*#__PURE__*/React.createContext();
++// patched: collects the styles of the components rendered on the server, to be sent with the page as <style>
++// elements, which the components find by their data-primereact-style-id and reuse instead of inserting new ones
++var escapeAttribute = function escapeAttribute(value) {
++  return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
++};
++var PrimeReactStyleSheet = /*#__PURE__*/function () {
++  function PrimeReactStyleSheet() {
++    this.styles = new Map();
++  }
++  PrimeReactStyleSheet.prototype.add = function add(name, css, nonce) {
++    if (!this.styles.has(name)) {
++      this.styles.set(name, { css: css, nonce: nonce });
++    }
++  };
++  PrimeReactStyleSheet.prototype.toString = function toString() {
++    var html = '';
++    this.styles.forEach(function (style, name) {
++      var nonce = style.nonce ? ' nonce="' + escapeAttribute(style.nonce) + '"' : '';
++      html += '<style data-primereact-style-id="' + escapeAttribute(name) + '"' + nonce + '>' + style.css.replace(/<\/style/gi, '<\\/style') + '</style>';
++    });
++    return html;
++  };
++  return PrimeReactStyleSheet;
++}();
++
+ var PrimeReactProvider = function PrimeReactProvider(props) {
+   var _props$value, _propsValue$ripple, _propsValue$inputStyl, _propsValue$locale, _propsValue$appendTo, _propsValue$styleCont, _propsValue$cssTransi, _propsValue$autoZInde, _propsValue$hideOverl, _propsValue$nonce, _propsValue$nullSortO, _propsValue$zIndex, _propsValue$ptOptions, _propsValue$pt, _propsValue$unstyled, _propsValue$filterMat;
+   var propsValue = (_props$value = props.value) !== null && _props$value !== void 0 ? _props$value : {};
+@@ -1110,7 +1135,8 @@ var PrimeReactProvider = function PrimeReactProvider(props) {
+     filterMatchModeOptions: filterMatchModeOptions,
+     setFilterMatchModeOptions: setFilterMatchModeOptions,
+     unstyled: unstyled,
+-    setUnstyled: setUnstyled
++    setUnstyled: setUnstyled,
++    styleSheet: propsValue.styleSheet
+   };
+   return /*#__PURE__*/React.createElement(PrimeReactContext.Provider, {
+     value: value
+@@ -1119,4 +1145,4 @@ var PrimeReactProvider = function PrimeReactProvider(props) {
+ 
+ var PrimeReact = PrimeReact$1;
+ 
+-export { FilterMatchMode, FilterOperator, FilterService, MessageSeverity, PrimeIcons, PrimeReactContext, PrimeReactProvider, SortOrder, addLocale, ariaLabel, PrimeReact as default, locale, localeOption, localeOptions, updateLocaleOption, updateLocaleOptions };
++export { FilterMatchMode, FilterOperator, FilterService, MessageSeverity, PrimeIcons, PrimeReactContext, PrimeReactProvider, PrimeReactStyleSheet, SortOrder, addLocale, ariaLabel, PrimeReact as default, locale, localeOption, localeOptions, updateLocaleOption, updateLocaleOptions };
+diff --git a/componentbase/componentbase.cjs.js b/componentbase/componentbase.cjs.js
+index d11e73715203f7472b573e76345ec16053f591bc..74987e4ffe837db1bc112d7aefb95bdfd801e4a9 100644
+--- a/componentbase/componentbase.cjs.js
++++ b/componentbase/componentbase.cjs.js
+@@ -338,6 +338,17 @@ var useHandleStyle = function useHandleStyle(styles) {
+     }
+   };
+   hook('useMountEffect');
++  // patched: effects don't run on the server, the styles are registered while rendering instead
++  if (typeof window === 'undefined') {
++    loadBaseStyle();
++    loadGlobalStyle();
++    if (!_isUnstyled()) {
++      loadCommonStyle();
++      if (!styled) {
++        loadComponentStyle();
++      }
++    }
++  }
+   hooks.useMountEffect(function () {
+     // Load base and global styles first as they are always needed
+     loadBaseStyle();
+diff --git a/componentbase/componentbase.esm.js b/componentbase/componentbase.esm.js
+index 9675f5ff831fde675b320342498e9ffad7c45879..782da3d5f8432c8638e8e165660c0b0ef2c5584a 100644
+--- a/componentbase/componentbase.esm.js
++++ b/componentbase/componentbase.esm.js
+@@ -330,6 +330,17 @@ var useHandleStyle = function useHandleStyle(styles) {
+     }
+   };
+   hook('useMountEffect');
++  // patched: effects don't run on the server, the styles are registered while rendering instead
++  if (typeof window === 'undefined') {
++    loadBaseStyle();
++    loadGlobalStyle();
++    if (!_isUnstyled()) {
++      loadCommonStyle();
++      if (!styled) {
++        loadComponentStyle();
++      }
++    }
++  }
+   useMountEffect(function () {
+     // Load base and global styles first as they are always needed
+     loadBaseStyle();
+diff --git a/hooks/hooks.cjs.js b/hooks/hooks.cjs.js
+index 6524b26690ff5ceae32b2516ed7ce974af37ecd4..9a67a26f4697ab39679ffa0d4c8a4b2819fce93f 100644
+--- a/hooks/hooks.cjs.js
++++ b/hooks/hooks.cjs.js
+@@ -1183,7 +1183,14 @@ var useStyle = function useStyle(css) {
+     isLoaded && css !== newCSS && (styleRef.current.textContent = newCSS);
+   };
+   var load = function load() {
+-    if (!document || isLoaded) {
++    // patched: on the server, the style is registered with the style sheet from the context, if there is one
++    if (!document) {
++      if (css && context && context.styleSheet) {
++        context.styleSheet.add(name, css, context.nonce || PrimeReact__default["default"].nonce);
++      }
++      return;
++    }
++    if (isLoaded) {
+       return;
+     }
+     var styleContainer = (context === null || context === void 0 ? void 0 : context.styleContainer) || document.head;
+@@ -1212,6 +1219,10 @@ var useStyle = function useStyle(css) {
+     utils.DomHandler.removeInlineStyle(styleRef.current);
+     setIsLoaded(false);
+   };
++  // patched: effects don't run on the server, the style is registered while rendering instead
++  if (!manual && !document) {
++    load();
++  }
+   React.useEffect(function () {
+     if (!manual) {
+       load();
+diff --git a/hooks/hooks.esm.js b/hooks/hooks.esm.js
+index 477b1e8cca4952c89631af5b56d588797bab5187..a7602ec498c76e288a66be5a191f1c1951b0c593 100644
+--- a/hooks/hooks.esm.js
++++ b/hooks/hooks.esm.js
+@@ -1157,7 +1157,14 @@ var useStyle = function useStyle(css) {
+     isLoaded && css !== newCSS && (styleRef.current.textContent = newCSS);
+   };
+   var load = function load() {
+-    if (!document || isLoaded) {
++    // patched: on the server, the style is registered with the style sheet from the context, if there is one
++    if (!document) {
++      if (css && context && context.styleSheet) {
++        context.styleSheet.add(name, css, context.nonce || PrimeReact.nonce);
++      }
++      return;
++    }
++    if (isLoaded) {
+       return;
+     }
+     var styleContainer = (context === null || context === void 0 ? void 0 : context.styleContainer) || document.head;
+@@ -1186,6 +1193,10 @@ var useStyle = function useStyle(css) {
+     DomHandler.removeInlineStyle(styleRef.current);
+     setIsLoaded(false);
+   };
++  // patched: effects don't run on the server, the style is registered while rendering instead
++  if (!manual && !document) {
++    load();
++  }
+   useEffect(function () {
+     if (!manual) {
+       load();

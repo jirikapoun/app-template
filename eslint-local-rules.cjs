@@ -53,7 +53,18 @@ module.exports = {
         }
         const specifier = source.value
         const name = packageName(specifier)
-        if (!name || !packages.has(name) || !/\.[cm]?js$/u.test(specifier)) {
+        if (!name || !packages.has(name)) {
+          return
+        }
+        if (specifier === name) {
+          // the package root is a prebuilt bundle of all modules, which doesn't share code (or patches) with them
+          context.report({
+            node: source,
+            message: `Import a module directory of '${name}', not the package root, which is a separate bundle of all its modules.`,
+          })
+          return
+        }
+        if (!/\.[cm]?js$/u.test(specifier)) {
           return
         }
         const directory = specifier.slice(0, specifier.lastIndexOf('/'))

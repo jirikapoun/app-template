@@ -172,6 +172,7 @@ patchedDependencies:
   eslint-plugin-consistent-default-export-name: 7dab133d7499efe6066581e52e9999af2bdcaa9a6b0090b3867d2c431e9e1d44
   eslint-plugin-import: 7f179448a25691495897149800c4261f6361d912cea3e8b9852b610bb82a56be
   eslint-plugin-modules-newline: b1b8b4dc8763b015079153a6405a1ac4831320431e8446260a4029764e10ea3c
+  primereact: 3f9b2dddaaf137f2f65ed164ddd2be8488de3c98be683a79945d64a999c9654b
 
 importers:
 
@@ -395,7 +396,7 @@ importers:
         version: 4.13.8
       primereact:
         specifier: ^10.9.9
-        version: 10.9.9(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 10.9.9(patch_hash=3f9b2dddaaf137f2f65ed164ddd2be8488de3c98be683a79945d64a999c9654b)(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -4003,7 +4004,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  primereact@10.9.9(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+  primereact@10.9.9(patch_hash=3f9b2dddaaf137f2f65ed164ddd2be8488de3c98be683a79945d64a999c9654b)(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       '@types/react-transition-group': 4.4.12(@types/react@19.3.0)
       react: 19.3.0

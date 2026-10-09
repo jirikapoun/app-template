@@ -17,3 +17,4 @@ patchedDependencies:
   eslint-plugin-consistent-default-export-name: patches/eslint-plugin-consistent-default-export-name.patch
   eslint-plugin-import: patches/eslint-plugin-import.patch
   eslint-plugin-modules-newline: patches/eslint-plugin-modules-newline.patch
+  primereact: patches/primereact.patch
