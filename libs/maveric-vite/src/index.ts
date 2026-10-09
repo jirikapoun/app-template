@@ -73,8 +73,9 @@ const maveric = ({ views }: MavericOptions): VitePlugin => {
         return
       }
       preload.add(url(chunk.file))
-      chunk.css?.forEach(cssFile => css.add(url(cssFile)))
+      // stylesheets of the imported chunks go first, so that the chunk's own rules win, like Vite orders them in HTML
       chunk.imports?.forEach(collect)
+      chunk.css?.forEach(cssFile => css.add(url(cssFile)))
     }
     if (!(key in manifest)) {
       throw new Error(`${key} is not an entry of the client build`)
