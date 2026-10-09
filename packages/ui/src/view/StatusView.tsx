@@ -1,4 +1,5 @@
 import { view } from '@maveric/client'
+import { Button } from 'primereact/button'
 import { useEffect, useState } from 'react'
 
 import App from '../App.js'
@@ -24,8 +25,12 @@ const StatusView = view<typeof statusResponses.getStatus>(({ uptime }) => {
   return (
     <App title="Status">
       <main className="flex min-h-screen items-center justify-center p-8">
-        <div className="rounded-border border border-surface-border bg-surface-card px-6 py-4">
-          <strong>Uptime:</strong> <span className="font-semibold text-primary">{currentUptime}</span> milliseconds
+        <div className="flex items-center gap-4 rounded-border border border-surface-border bg-surface-card px-6 py-4">
+          <span className="icon-[tabler--activity-heartbeat] text-2xl text-primary" aria-hidden="true" />
+          <div>
+            <strong>Uptime:</strong> <span className="font-semibold text-primary">{currentUptime}</span> milliseconds
+          </div>
+          <Button label="Refresh" icon="icon-[prime--refresh]" size="small" outlined onClick={() => window.location.reload()} />
         </div>
       </main>
     </App>

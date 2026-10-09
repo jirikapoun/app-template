@@ -7,6 +7,9 @@
 @import "primereact/resources/themes/lara-light-cyan/theme.css";
 /* the dev server runs in the repository, the production build in the package, so the sources are explicit */
 @import "tailwindcss" source("../");
+/* icons as classes, `icon-[prime--refresh]`: PrimeIcons where it has the icon, as it matches the components, Tabler
+   otherwise */
+@plugin "../../tailwind-icons.ts";
 
 /* utilities for the theme's variables, named after them (`bg-surface-card`, `text-color-secondary`), so that
    the styles follow the theme */
