@@ -85,15 +85,34 @@ For every `ctx.render(object, status, headers?)`, the renderer:
 3. **Picks the view for the status** passed to `ctx.render()`. The status set by `ctx.status()` can't be read by middleware, and `ctx.res.status` is always 200 at this point, hence the required `status` argument.
 4. **Falls back to JSON** when the route has no views, or none for the status.
 5. **Round-trips the props through JSON**, so that the server renders the view with exactly the props the browser will get for hydration.
-6. **Renders the view** with `renderToString` and prepends `<!DOCTYPE html>`.
+6. **Renders the view** with `renderToString` and prepends `<!DOCTYPE html>`. Components can register HTML for `<head>` while rendering (see [below](#inserting-html-into-head)).
 7. **Looks up the view in the client manifest.** A view that isn't listed (its file doesn't match the `views` pattern of the Vite plugin) is rendered without hydration, and the middleware logs a warning.
 8. **Injects the client code**:
-   - at the end of `<head>`: the development scripts from the manifest, stylesheet links and `modulepreload` links;
+   - at the end of `<head>`: the development scripts from the manifest, the view's stylesheets (as `<style>` elements during development, see [below](#stylesheets-during-development), as links in production), `modulepreload` links, and the HTML registered by components;
    - at the end of `<body>`: the hydration payload, the runtime's module script and the manifest's body content.
+
+During development, `ctx.render()` returns a promise of the response, because the stylesheets are loaded asynchronously; in production, it returns the response itself. Handlers return it either way. Hono's own `c.render()` is typed the same way.
 
 The client code is injected outside of the tree rendered by React. During hydration, React 19 skips nodes it didn't render directly inside `<html>`, `<head>` and `<body>`, and ignores extra nodes after its own. The code goes at the very end, after React's nodes, so that React never mistakes an injected tag for one of its own elements of the same type.
 
 The payload is JSON in a `<script type="application/json">` element, so it isn't executed and doesn't require inline JavaScript. Every `<` in it is escaped as `<`, so that the data can't close the `<script>` element.
+
+## Inserting HTML into `<head>`
+
+Some libraries insert elements into `<head>` in the browser, such as the styles of their components. With `useServerInsertedHTML()` from `@maveric/client`, they can collect them while rendering on the server, and send them with the page:
+
+```tsx
+const [styleSheet] = useState(() => new PrimeReactStyleSheet())
+useServerInsertedHTML(() => styleSheet.toString())
+```
+
+- **The callback runs after rendering**, once all components have registered what they collected. Its HTML goes to the end of `<head>`, after the stylesheets, where libraries insert their elements in the browser.
+- **Every call registers the callback**, like Next.js' hook of the same name. A component rendering twice within one server render registers it twice.
+- **In the browser, the hook does nothing.**
+- **The callbacks are collected in a module-level registry**, which is enough, because views are rendered synchronously, one at a time. The renderer collects them with `renderWithInsertedHTML()` from `@maveric/client`.
+- The HTML is also inserted into pages whose view can't be hydrated.
+
+The project uses it for the styles of PrimeReact components (see [PrimeReact](primereact.md#server-rendered-component-styles)).
 
 ## Client manifest
 
@@ -111,6 +130,7 @@ interface ClientManifest {
   views: Map<unknown, ClientEntry>  // keyed by the view components
   head: string                      // HTML for the end of <head>
   body: string                      // HTML for the end of <body>
+  styles?(entry: ClientEntry): Promise<string>  // the view's stylesheets as HTML, during development
 }
 ```
 
@@ -129,11 +149,31 @@ The application doesn't import the virtual module directly: `@app/ui` re-exports
 | `preload` | empty | the entry and all chunks it imports, recursively |
 | `css` | empty | the stylesheets of the entry and all chunks it imports, those of the imported chunks first |
 | `head`, `body` | the scripts Vite and its plugins inject into pages (Vite client, React Refresh setup) | empty |
+| `styles` | the view's stylesheets as `<style>` elements (see [below](#stylesheets-during-development)) | absent |
 
 - **No preloads in development**, because Vite adds `?import` to the URLs of dynamically imported modules, so a preloaded URL would never match the actual request, and the module would be fetched twice.
 - **Stylesheets are ordered like Vite orders them in HTML pages:** those of the imported chunks first, then the chunk's own, so that the rules of a view override those of the layout and libraries it imports. The order is per chunk: a view importing its own stylesheet before a component from a shared chunk still gets the shared chunk's stylesheet first.
 - **The development scripts** are collected by running Vite's `transformIndexHtml()` on an empty document, so every plugin that injects something into pages (now or in the future) works without hand-written snippets.
 - **The manifest is regenerated** when a view file is added or removed during development (implemented, but not exercised yet).
+
+### Stylesheets during development
+
+During development, Vite applies stylesheets by injecting `<style>` elements once the JavaScript importing them runs, so a server-rendered page would be unstyled until then. The `styles()` member of the development manifest renders the view's stylesheets into the page instead:
+
+- **Which stylesheets.** After the view has been rendered, the server module graph contains all modules it imports. The plugin walks the graph from the view module, in import order, and collects the stylesheets, from the project and from packages (such as the PrimeReact theme) alike. It doesn't descend into the imports of a stylesheet (`@import`, the sources Tailwind scans), which are part of it, and skips stylesheets imported as URLs or strings (`?url`, `?inline`, `?raw`).
+- **How.** Each stylesheet becomes a `<style data-vite-dev-id="…">` element, identified by the resolved file path and containing the processed CSS, which the plugin loads as `?inline` on the server. Vite's client adopts an element with the id of a stylesheet instead of injecting its own copy: there are no duplicates, hot updates replace the content of the element, and removing the import removes it (see [Hot reloading](hot-reload.md#stylesheets)).
+- **The connection to the plugin.** The manifest module runs in Vite's module runner, while the plugin runs in Node.js itself, in the same process; `styles()` calls the plugin through a global (`Symbol.for('maveric:dev-styles')`).
+
+Rejected alternatives:
+
+- **Links** (`<link rel="stylesheet" data-vite-dev-id>`), which Vite's client adopts as well. The browser requests a linked stylesheet as `?direct`, which adds another module for the file to the browser module graph. For a CSS Module, that module can't accept updates and has no importers, so every change of a CSS Module would reload all open pages. Loading the content on the browser side (`?inline`, `?direct`) has the same effect, that's why the content is loaded on the server.
+- **Removing the server-rendered styles after hydration**, leaving the updates to Vite's own elements: the styles would be duplicated until then, and the runtime would need code to remove them.
+
+Costs and caveats:
+
+- Pages are larger during development, by the size of their stylesheets (over 200 kB with the PrimeReact theme).
+- Adopting an element, Vite's client rewrites its content, so fonts the stylesheet references are requested again. In Chrome 154 and later, text with `font-display: optional` fonts may stay in the fallback font ([Vite issue #23696](https://github.com/vitejs/vite/issues/23696), fixed after Vite 8.3.3).
+- The module graph doesn't distinguish static and dynamic imports, so the stylesheets of dynamically imported modules are rendered too (not tested yet).
 
 ### Keyed by components
 
@@ -173,6 +213,5 @@ That's the main reason `@app/ui` is built by Vite instead of `tsc`: the manifest
 - One view per response; views render synchronously with `renderToString` (no streaming, no async components).
 - The view is chosen by the status passed to `ctx.render()`; a status set only by `ctx.status()` isn't taken into account.
 - Missing views fall back to JSON silently (see the TODOs in the middleware).
-- During development, stylesheets imported by views aren't part of the rendered page; Vite applies them only once the JavaScript runs.
 
 See also [Roadmap](roadmap.md).

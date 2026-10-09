@@ -66,7 +66,7 @@ sequenceDiagram
     R-->>B: JSON response
   else Accept prefers HTML
     R->>R: render the route's view for status 200 (renderToString)
-    R->>R: inject the hydration payload, runtime and preloads
+    R->>R: inject the stylesheets, hydration payload, runtime and preloads
     R-->>B: HTML document
     B->>B: runtime imports the view module
     B->>B: hydrateRoot(document, <View {...props} />)

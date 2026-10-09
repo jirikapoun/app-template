@@ -21,7 +21,7 @@ All other packages are compiled by `tsc` (see [Workspace packages](workspace-pac
   - `injectClientScript: false`: the rendering middleware injects the client scripts itself (see [Server-side rendering and hydration](rendering.md#rendering-middleware)).
   - `exclude`: the plugin's middleware runs *before* Vite serves files, and passes every request to the Hono application unless it matches the `exclude` patterns or a file in the public directory. The default patterns cover URLs like `*.ts`, `*.tsx`, `*.css` or `/@…`, but not, for example, an imported image (`/packages/ui/src/logo.svg?import`), which the Hono application would answer with a 404. The configuration therefore adds `/^\/(?:packages|libs)\//`: all source files of the workspace are served by Vite.
 - **`@vitejs/plugin-react`** — React Fast Refresh. Its setup script is injected into pages by the rendering middleware, like the Vite client.
-- **`maveric({ views })`** from `@maveric/vite` — generates the client manifest, injects the development scripts into pages, keeps views recognizable by Fast Refresh and refreshes pages after server-side changes. See [Server-side rendering and hydration](rendering.md#client-manifest) and [Hot reloading](hot-reload.md).
+- **`maveric({ views })`** from `@maveric/vite` — generates the client manifest, injects the development scripts and the views' stylesheets into pages, keeps views recognizable by Fast Refresh and refreshes pages after server-side changes. See [Server-side rendering and hydration](rendering.md#client-manifest) and [Hot reloading](hot-reload.md).
 
 ### Resolution
 
@@ -125,5 +125,6 @@ apps/server/dist/
 ## Pitfalls
 
 - **Don't bundle dependencies in the dev server.** `ssr.noExternal: true` belongs to the production server build only. In the dev server, it makes Vite's module runner evaluate React's CommonJS entry as an ES module, which fails with *module is not defined*.
+- **A stylesheet module nothing imports reloads all pages.** A `<link>` requests its stylesheet as `?direct`, and a plugin can request one as `?inline` through the browser environment; both add a module for the file to the browser module graph without any importer. For a CSS Module, such a module can't accept updates, so Vite reloads all open pages on every change of the file. That's why the `maveric` plugin loads the stylesheets it renders into pages through the server environment (see [Server-side rendering and hydration](rendering.md#stylesheets-during-development)).
 - **Externals resolve to bare specifiers.** In a build that keeps dependencies external, `this.resolve()` returns the package specifier instead of a file path. That's why the `maveric` plugin takes the runtime's file from the client build, which bundles it.
 - **Stopping the dev server on Windows** may leave Vite's process running, still holding port 5173; the next dev server then starts on port 5174. Check for leftover `node` processes if the port changes unexpectedly.

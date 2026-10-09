@@ -64,7 +64,7 @@ Static files are served before the API's middleware, so they get neither compres
 - Faster startup: there's no module resolution through `node_modules`, and far fewer files are read.
 - Runtime performance is the same as unbundled code.
 
-**What's inside:** about 2.1 MB (420 kB compressed), including both builds of React (development and production) and the root `package.json`, which `config.ts` imports for the application name and version.
+**What's inside:** about 2.1 MB (430 kB compressed), including both builds of React (development and production) and the root `package.json`, which `config.ts` imports for the application name and version.
 
 **Limitations.** Some packages don't survive bundling:
 

@@ -23,7 +23,7 @@ From that single definition, the same URL answers API clients with JSON, documen
 - 🎯 **One definition, three outputs:** a JSON API, its OpenAPI description, and a server-rendered page.
 - 🔀 **Content negotiation:** the same URL serves JSON or HTML, depending on the `Accept` header.
 - 🛡️ **End-to-end types:** the schema types the handler's return value and the view's props.
-- 💧 **Server-side rendering with hydration:** views render the whole document and hydrate in the browser with React 19.
+- 💧 **Server-side rendering with hydration:** views render the whole document, styled from the first paint also during development, and hydrate in the browser with React 19.
 - 🔥 **Fast development:** React Fast Refresh for views, and pages that refresh in place with fresh data when server code changes.
 - 📦 **Optimized production builds** with Vite 8: hashed chunks, preloading, and a separately cached vendor chunk.
 - 🌍 **Runtime-agnostic API:** applications are [Hono](https://hono.dev) applications. Node.js is supported now, edge runtimes are planned.

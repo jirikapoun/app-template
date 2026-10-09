@@ -13,6 +13,7 @@
 - **Generated configuration documentation.** Generate the configuration tables in the READMEs (such as the one in [`@app/utils`](../packages/utils/README.md#configuration)) from the Zod schemas defining the configuration, with [`@jackdbd/zod-to-doc`](https://www.npmjs.com/package/@jackdbd/zod-to-doc).
 - **Configuration structure.** Decide between a single configuration object for the whole application (as now, in `@app/utils`) and per-package configurations, where each package defines and validates its own configuration and `@app/utils` only provides the scaffolding for creating them. Both have benefits and drawbacks, so the decision needs deeper consideration.
 - **Minified responses.** Minifying the rendered pages, including the stylesheets inlined into them, could make them smaller. It needs prototyping and benchmarking first: responses already pass through the `compress()` middleware (`packages/api/src/index.ts`), so minifying them as well may save little, and its overhead on every request could make pages load slower in the end.
+- **A fork of PrimeReact 10.** Keeping PrimeReact 10, the last open-source version, alive under a new name, with the patch rendering the component styles on the server as its foundation. Worth it if PrimeReact 10 stops being maintained, or the patch grows too large; its [limits](primereact.md#limits) are the starting points.
 - **Views in the OpenAPI document.** HTML responses aren't described in the OpenAPI document yet (`Controller.endpoint()` adds an empty `text/html` content entry for routes with views). The idea is for `view()` to accept metadata, such as a description of the view, which `Controller.endpoint()` would pass into the OpenAPI document.
 
 ## Known limitations
@@ -22,7 +23,7 @@
 - One view per response, rendered synchronously with `renderToString`: no streaming, no async components.
 - The view is chosen by the status passed to `ctx.render()`; a status set only by `ctx.status()` isn't taken into account.
 - When a route has no view, or none for the status, the middleware responds with JSON without any warning (see the `TODO`s in `libs/maveric-server/src/rendering.ts`).
-- During development, stylesheets imported by views aren't part of the rendered page; Vite applies them only once the JavaScript runs, so pages show unstyled content first. In production, they are linked from the client manifest.
+- During development, the stylesheets of dynamically imported modules are rendered into the page too, because the module graph doesn't distinguish static and dynamic imports (not tested yet).
 - Regenerating the client manifest when a view file is added or removed is implemented, but hasn't been exercised yet.
 - Browser extensions that add attributes to `<html>` or `<body>` cause hydration warnings in development; this is by design (see [Server-side rendering and hydration](rendering.md#hydration-consistency)).
 
@@ -39,3 +40,8 @@
 - The dev server loads `@maveric/vite` from its build, so changes to the plugin require a restart. Node.js's type stripping could load it from source in the future.
 - The editor sees the ambient types of all environments (see [TypeScript configuration](typescript.md#ambient-types-are-declared-at-the-root)).
 - TypeScript 6 is kept next to TypeScript 7 until typescript-eslint supports the native compiler.
+- Adopting the stylesheets rendered into a page, Vite's client rewrites their content, so the fonts they reference are requested again; in Chrome 154 and later, `font-display: optional` fonts may stay in the fallback font ([Vite issue #23696](https://github.com/vitejs/vite/issues/23696)). The fix was merged after Vite 8.3.3; update Vite once it's released.
+
+### PrimeReact
+
+- Styles that components create per instance (breakpoints, responsive options, DataTable's `stack` layout and column resizing) still appear only after hydration, because they're keyed by ids generated in the browser. Covering them requires matching ids on the server and in the browser, a separate change in each component. The other limits of the patch are described in [PrimeReact](primereact.md#limits).

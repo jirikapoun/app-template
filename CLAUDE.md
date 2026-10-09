@@ -13,7 +13,8 @@ The documentation is extensive; read the relevant file before changing an area:
 - [docs/workspace-packages.md](docs/workspace-packages.md) — package conventions, the `source` export condition, adding a package
 - [docs/vite.md](docs/vite.md) — dev server, per-package production builds
 - [docs/rendering.md](docs/rendering.md) — views, rendering middleware, client manifest, runtime
-- [docs/hot-reload.md](docs/hot-reload.md) — Fast Refresh, props refresh
+- [docs/hot-reload.md](docs/hot-reload.md) — Fast Refresh, props refresh, stylesheets
+- [docs/primereact.md](docs/primereact.md) — imports, the patch rendering component styles on the server, its limits
 - [docs/deployment.md](docs/deployment.md), [docs/tooling.md](docs/tooling.md), [docs/roadmap.md](docs/roadmap.md), [docs/documentation.md](docs/documentation.md)
 
 ## Commands
@@ -35,7 +36,7 @@ There are no tests yet. Useful URLs in dev: `/status` (page, or JSON with `Accep
 
 - `libs/` = framework (`@maveric/client`, `@maveric/server`, `@maveric/vite`, app-agnostic); `packages/` = app layers (`@app/schema`, `@app/utils`, `@app/ui`, `@app/api`); `apps/` = deployable entry points (`@app/server`).
 - **Two contexts.** Development: one TypeScript program (root `tsconfig.json`) and one dev server (root `vite.config.ts`), workspace packages resolved to sources through the `source` export condition. Production: every package builds itself (`tsc`, or Vite for `@app/ui` and `@app/server`) from its sources and its dependencies' `dist`. Cross-package imports only through `exports`.
-- **Rendering:** controller → `ctx.render(data, status)` → rendering middleware → JSON, or the route's view rendered as the whole document + injected payload/runtime → browser hydrates `document`. The client manifest (`virtual:maveric/manifest`, re-exported as `@app/ui/manifest`) maps view components to client files.
+- **Rendering:** controller → `ctx.render(data, status)` → rendering middleware → JSON, or the route's view rendered as the whole document + injected payload/runtime/stylesheets → browser hydrates `document`. The client manifest (`virtual:maveric/manifest`, re-exported as `@app/ui/manifest`) maps view components to client files; in dev, its `styles()` renders a view's stylesheets as `<style data-vite-dev-id>` elements. Components add HTML to `<head>` with `useServerInsertedHTML()`.
 - **Hot reloading:** browser modules → Fast Refresh; server-only modules → props refresh in tabs with a hydrated view (full reload elsewhere), implemented in `@maveric/vite` and the runtime.
 
 ## Rules that are easy to break
@@ -47,7 +48,9 @@ There are no tests yet. Useful URLs in dev: `/status` (page, or JSON with `Accep
 - **`@maveric/vite` is loaded from its build** when Vite reads its config: after changing it, rebuild it (or restart `pnpm dev`).
 - **Views:** component as the first argument of `view()`, the only export, `export default <Name>`; browser-safe imports; deterministic first render; render the whole document via `App`.
 - **`ctx.render()` requires the status**; the view is chosen by it.
-- **PrimeReact imports** name the module directory (`primereact/inplace`), never a file in it; TypeScript 7 auto-imports suggest files, a local ESLint rule fixes them (see [docs/tooling.md](docs/tooling.md#editor)).
+- **PrimeReact imports** name the module directory (`primereact/inplace`), never a file in it or the package root; TypeScript 7 auto-imports suggest files, a local ESLint rule fixes them (see [docs/primereact.md](docs/primereact.md#imports)).
+- **PrimeReact is patched** (`patches/primereact.patch`, both its ESM and CommonJS builds): change the patch with `pnpm patch primereact` and `pnpm patch-commit`, never in `node_modules` (see [docs/primereact.md](docs/primereact.md#maintaining-the-patch)).
+- **Never load a stylesheet through the browser environment** (`?inline`, `?direct`) in `@maveric/vite`: a module nothing imports makes Vite reload all pages on CSS Module changes (see [docs/vite.md](docs/vite.md#pitfalls)).
 - **`@hono/vite-dev-server` intercepts URLs** not matching its `exclude` patterns; source URLs must stay excluded.
 - **TypeScript 6 crashes** on path mappings with several extension-specific fallbacks.
 
@@ -110,6 +113,7 @@ chrome-devtools stop
 - No reload: set `window.__marker = true` before a change, check it afterwards.
 - Fast Refresh: edit a view's text (read the bytes first, restore them byte for byte afterwards); text changes, marker and counter survive.
 - Props refresh: rewrite [the status controller](packages/api/src/controller/status.controller.ts) with identical bytes; the uptime resets to a few seconds without a reload.
+- Before hydration: fetch the page (`Accept: text/html`), remove its `<script>` elements, save it as a temporary file in the public directory (`packages/ui/public`, or `client/` of the production copy), open it and compare it with the hydrated page (`chrome-devtools take_screenshot <id> --filePath …`).
 - The user may have the page open in their own browser with the Dark Reader extension: hydration warnings about `data-darkreader-*` in the dev server log come from that tab.
 
 ## Environment pitfalls (Windows, PowerShell 5.1)

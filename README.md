@@ -87,6 +87,7 @@ See [Architecture](docs/architecture.md) for details.
 | [Vite setup](docs/vite.md) | development server, production builds |
 | [Server-side rendering and hydration](docs/rendering.md) | views, rendering middleware, client manifest, browser runtime |
 | [Hot reloading](docs/hot-reload.md) | Fast Refresh, refreshing pages after server-side changes |
+| [PrimeReact](docs/primereact.md) | integration, imports, server-rendered component styles (a patch) and their limits |
 | [Deployment](docs/deployment.md) | production artifact, configuration, Docker, Cloudflare Workers |
 | [Tooling](docs/tooling.md) | scripts, ESLint, formatting, editor, Git conventions |
 | [Roadmap](docs/roadmap.md) | planned features, known limitations |

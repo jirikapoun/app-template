@@ -56,7 +56,7 @@ For TypeScript, reference the declaration of the virtual module, for example in 
 
 ### `virtual:maveric/manifest`
 
-The client manifest (`ClientManifest` from `@maveric/client`): for every view component its client-side entry, plus the entry of the browser runtime and HTML to inject into pages. Its type is declared by `@maveric/vite/manifest`.
+The client manifest (`ClientManifest` from `@maveric/client`): for every view component its client-side entry, plus the entry of the browser runtime and HTML to inject into pages, and during development a function rendering the stylesheets of a view. Its type is declared by `@maveric/vite/manifest`.
 
 ## What the plugin does
 
@@ -64,6 +64,7 @@ The client manifest (`ClientManifest` from `@maveric/client`): for every view co
 
 - **Generates the manifest** with the source URLs of the views and the runtime, and regenerates it when view files are added or removed (not exercised yet).
 - **Collects the scripts Vite and its plugins inject into pages** (the Vite client, the React Refresh setup) by running `transformIndexHtml()` on an empty document, and passes them to the rendering middleware through the manifest.
+- **Renders the stylesheets a view imports into the page**, so that it's styled before its scripts run. They're `<style data-vite-dev-id>` elements, which Vite's client adopts and keeps up to date instead of injecting its own copies.
 - **Sets a display name on every view** (the file name), so that React Fast Refresh recognizes views as components. Views must be exported as default, as a variable.
 - **Refreshes pages after server-side changes.** When a module used only on the server changes, tabs with a hydrated view re-render it with fresh props, without reloading; other tabs reload.
 - **Lets the dependency optimizer discover the views' dependencies** before the first page load.

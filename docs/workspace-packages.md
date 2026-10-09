@@ -82,7 +82,7 @@ If a package is ever published, its `source` condition points to files that aren
   - `react` and `react-dom`, which `@vitejs/plugin-react` asks the dev server's dependency optimizer to pre-bundle, resolving them from the root (see [Vite setup](vite.md#development-server));
   - `@maveric/vite`, imported by the root `vite.config.ts`.
 - **Workspace protocol.** Workspace dependencies use `workspace:*`.
-- **Patched dependencies.** Some third-party packages are patched through `patchedDependencies` in `pnpm-workspace.yaml`; the patches live in `patches/`.
+- **Patched dependencies.** Some third-party packages are patched through `patchedDependencies` in `pnpm-workspace.yaml`; the patches live in `patches/`. Most adapt ESLint configurations and plugins to the current ESLint (see [Tooling](tooling.md#eslint)); `primereact.patch` renders the styles of PrimeReact components on the server (see [PrimeReact](primereact.md#the-patch)). Patches are created and changed with `pnpm patch <package>` and `pnpm patch-commit <directory>`; a patch that no longer applies fails the installation.
 
 ## Turborepo
 

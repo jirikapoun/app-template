@@ -62,6 +62,19 @@ Rules for views:
 
 The type of a view: a synchronous component with an optional `displayName`. The Vite plugin sets `displayName` to the name of the view's file.
 
+### `useServerInsertedHTML(callback)`
+
+Registers a callback returning HTML for the end of `<head>`, for libraries that insert elements into `<head>` in the browser, such as the styles of their components. Collected while rendering on the server, they are sent with the page.
+
+```tsx
+const [styleSheet] = useState(() => new SomeStyleSheet())
+useServerInsertedHTML(() => styleSheet.toString())
+```
+
+- The callback runs once the view has been rendered on the server; its HTML is injected after the stylesheets.
+- Every call registers the callback, like Next.js' hook of the same name.
+- In the browser, it does nothing.
+
 ### `@maveric/client/runtime`
 
 The browser entry point. It reads the hydration payload from the page, imports the view module and hydrates the document (`hydrateRoot(document, …)`). In development, it also handles refreshes after server-side changes.
@@ -74,15 +87,16 @@ Types and constants shared by `@maveric/server`, `@maveric/vite` and the runtime
 
 | Export | Kind | Description |
 |---|---|---|
-| `ClientManifest` | type | client-side code of the views: `{ runtime, views, head, body }` |
+| `ClientManifest` | type | client-side code of the views: `{ runtime, views, head, body, styles? }`; `styles()` renders a view's stylesheets during development |
 | `ClientEntry` | type | one client-side entry: `{ url, preload, css }` |
 | `Payload` | type | data passed from the server to the runtime: `{ view, props }` |
 | `PAYLOAD_ELEMENT_ID` | constant | id of the `<script type="application/json">` element holding the payload (`__maveric`) |
 | `HMR_EVENTS` | constant | names of the custom HMR events exchanged with the dev server (`hydrated`, `serverUpdate`) |
+| `renderWithInsertedHTML` | function | renders a view, collecting the HTML registered with `useServerInsertedHTML()` (used by the rendering middleware) |
 
 ## How it works
 
-1. The server renders the view and injects the payload (`{ view: <URL of the view module>, props }`) and the runtime's module script into the page.
+1. The server renders the view and injects the payload (`{ view: <URL of the view module>, props }`), the runtime's module script, the view's stylesheets and the HTML registered by its components into the page.
 2. The runtime reads the payload, imports the view module and hydrates the document with the same props.
 3. In development, it tells the dev server it has hydrated a view, and re-renders the view with fresh props when server-side code changes.
 

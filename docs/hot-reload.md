@@ -9,6 +9,8 @@ During development, changes are applied to open pages without losing their state
 | A view, the layout or another component | Fast Refresh: the component is replaced, its state is kept |
 | A non-component module imported by components (helpers, constants) | Fast Refresh of the importing components |
 | A module that exports components together with objects or functions | full reload |
+| A stylesheet, or an import of one added or removed | the styles are updated in place (see [below](#stylesheets)) |
+| A CSS Module | Fast Refresh of the components importing it, whose class names may change, and its styles are updated in place |
 | A module used only on the server (controller, schema, middleware, configuration) | props refresh in pages with a hydrated view; full reload in other pages |
 | The runtime or other modules imported only by it | full reload |
 | A view file added or removed | the client manifest is regenerated |
@@ -46,6 +48,12 @@ useEffect(() => {
 ```
 
 The same pattern also makes the view follow new props, whether they come from a props refresh or, later, from polling the server.
+
+## Stylesheets
+
+Vite updates stylesheets in the browser on its own: the module of a stylesheet replaces the content of its `<style>` element when the file changes, and removes the element when no module imports the stylesheet anymore. The stylesheets the server renders into the page (see [Server-side rendering and hydration](rendering.md#stylesheets-during-development)) take part in this, because Vite's client adopts them as its own elements.
+
+When a hot update adds the import of a stylesheet, Vite inserts it at the end of `<head>`, so until the next reload, it may follow stylesheets it precedes in import order.
 
 ## Props refresh
 

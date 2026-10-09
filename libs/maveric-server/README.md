@@ -86,13 +86,15 @@ A Hono middleware that sets the renderer for `ctx.render()`.
 Responds with `data`:
 
 1. As **JSON**, unless the request prefers HTML (`Accept`).
-2. As **HTML** otherwise: the route's view for `status` is rendered with `data` as its props, and the page gets the hydration payload, the browser runtime and preload links from the manifest. Routes without a view for the status answer JSON.
+2. As **HTML** otherwise: the route's view for `status` is rendered with `data` as its props, and the page gets the hydration payload, the browser runtime, the view's stylesheets and preload links from the manifest, and the HTML its components register with `useServerInsertedHTML()` from `@maveric/client`. Routes without a view for the status answer JSON.
 
 `status` is required, because the view is chosen by it. The props are passed through `JSON.stringify` and `JSON.parse` first, so the server renders exactly what the browser receives.
 
+During development, where the dev server renders the stylesheets into the page, `ctx.render()` returns a promise of the response, otherwise the response itself, like Hono's `c.render()`. Return it from the handler either way.
+
 ## How it works
 
-- Views are rendered with `renderToString` and must render the whole document. The client code is injected at the end of `<head>` and `<body>`, outside the tree rendered by React, which React 19 ignores during hydration.
+- Views are rendered with `renderToString` and must render the whole document. The client code is injected at the end of `<head>` and `<body>`, outside the tree rendered by React, which React 19 ignores during hydration. At the end of `<head>`, it comes in this order: the development scripts, the stylesheets, the preload links, the HTML registered with `useServerInsertedHTML()`.
 - The middleware finds the views on the handler of the matched route, also when the application is mounted into another one.
 - A view missing from the manifest is rendered without hydration, with a warning in the log.
 
