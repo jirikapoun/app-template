@@ -1,4 +1,4 @@
-import 'primereact/resources/themes/lara-light-cyan/theme.css'
+import './style/main.css'
 import { useServerInsertedHTML } from '@maveric/client'
 import { PrimeReactProvider, PrimeReactStyleSheet } from 'primereact/api'
 import { useState } from 'react'
@@ -23,7 +23,7 @@ const App = ({ title, children }: AppProps) => {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <title>{title}</title>
         </head>
-        <body>
+        <body className="bg-surface-ground text-color">
           {children}
         </body>
       </html>

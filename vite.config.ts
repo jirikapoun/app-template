@@ -1,4 +1,5 @@
 import devServer, { defaultOptions } from '@hono/vite-dev-server'
+import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defaultClientConditions, defaultServerConditions, defineConfig } from 'vite'
 
@@ -28,6 +29,7 @@ const viteConfig = defineConfig({
       exclude: [...defaultOptions.exclude, /^\/(?:packages|libs)\//u],
     }),
     react(),
+    tailwindcss(),
     maveric({
       views: 'packages/ui/src/view/**/*.tsx',
     }),

@@ -23,9 +23,11 @@ const StatusView = view<typeof statusResponses.getStatus>(({ uptime }) => {
 
   return (
     <App title="Status">
-      <div>
-        <strong>Uptime:</strong> {currentUptime} milliseconds
-      </div>
+      <main className="flex min-h-screen items-center justify-center p-8">
+        <div className="rounded-border border border-surface-border bg-surface-card px-6 py-4">
+          <strong>Uptime:</strong> <span className="font-semibold text-primary">{currentUptime}</span> milliseconds
+        </div>
+      </main>
     </App>
   )
 })

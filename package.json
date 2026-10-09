@@ -17,6 +17,7 @@
     "@strv/eslint-config-mocha": "^5.0.0",
     "@strv/eslint-config-node": "^5.0.0",
     "@strv/eslint-config-typescript": "^6.0.0",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.6.4",
     "@vitejs/plugin-react": "^6.1.2",
     "eslint": "^10.11.0",

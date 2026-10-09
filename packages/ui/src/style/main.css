@@ -1,0 +1,39 @@
+/* the PrimeReact theme defines the `primereact` layer: above Tailwind's preflight, which would reset its components,
+   and below the utilities, which may override them */
+@layer theme, base, primereact, components, utilities;
+
+/* imported here rather than from JavaScript, as the order of layers is decided by their first appearance;
+   the theme's name selects the mode and the accent: lara-{light,dark}-{amber,blue,cyan,green,indigo,pink,purple,teal} */
+@import "primereact/resources/themes/lara-light-cyan/theme.css";
+/* the dev server runs in the repository, the production build in the package, so the sources are explicit */
+@import "tailwindcss" source("../");
+
+/* utilities for the theme's variables, named after them (`bg-surface-card`, `text-color-secondary`), so that
+   the styles follow the theme */
+@theme inline {
+  --font-sans: var(--font-family);
+  --radius-border: var(--border-radius);
+  --color-primary: var(--primary-color);
+  --color-primary-contrast: var(--primary-color-text);
+  --color-highlight: var(--highlight-bg);
+  --color-highlight-contrast: var(--highlight-text-color);
+  --color-color: var(--text-color);
+  --color-color-secondary: var(--text-color-secondary);
+  --color-surface-0: var(--surface-0);
+  --color-surface-50: var(--surface-50);
+  --color-surface-100: var(--surface-100);
+  --color-surface-200: var(--surface-200);
+  --color-surface-300: var(--surface-300);
+  --color-surface-400: var(--surface-400);
+  --color-surface-500: var(--surface-500);
+  --color-surface-600: var(--surface-600);
+  --color-surface-700: var(--surface-700);
+  --color-surface-800: var(--surface-800);
+  --color-surface-900: var(--surface-900);
+  --color-surface-ground: var(--surface-ground);
+  --color-surface-section: var(--surface-section);
+  --color-surface-card: var(--surface-card);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-surface-border: var(--surface-border);
+  --color-surface-hover: var(--surface-hover);
+}

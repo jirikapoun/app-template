@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import { maveric } from '@maveric/vite'
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 
 
@@ -9,6 +10,7 @@ const viteConfig = defineConfig({
   tsconfig: 'tsconfig.build.json',
   plugins: [
     maveric({ views }),
+    tailwindcss(),
   ],
   environments: {
     // browser bundle of the views, served by the server as static files
