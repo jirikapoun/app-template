@@ -4,7 +4,9 @@ Every feature of the application is described in its own document in this direct
 
 ## Index
 
-No feature is described yet.
+| Feature | Summary |
+|---|---|
+| [Server status](server-status.md) | a liveness check for deployments and monitoring, and a page polling it |
 
 ## What a feature is
 

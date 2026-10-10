@@ -3,7 +3,8 @@
 ## Planned
 
 - **API client.** A typed client generated from the route definitions and schemas, usable from views.
-- **Polling the server status.** `StatusView` should periodically fetch the uptime from the server, to show whether the server is still up. It already follows new props (see [Hot reloading](hot-reload.md#effects-and-fast-refresh)); it needs the API client.
+- **Server status.** A liveness check for deployments and monitoring, and a page polling it, replacing the current status page; see [Server status](features/server-status.md).
+- **Readiness and dependency checks.** Once the application has dependencies, such as a database, or shuts down gracefully, a readiness check next to the liveness check of [Server status](features/server-status.md).
 - **Dynamic navigation.** Navigation in the layout, rendered in every view. Since every page URL also serves its data as JSON, client-side navigation can fetch the props of the next page and render its view without a full page load.
 - **Cloudflare Workers.** A second deployment target next to the Node.js server; see [Deployment](deployment.md#cloudflare-workers-future).
 - **Standalone Maveric.** Moving `libs/` into its own repository, with an overarching `maveric` package bundling the framework packages for simpler projects. Its documentation is prepared in [`libs/maveric/README.md`](../libs/maveric/README.md).
