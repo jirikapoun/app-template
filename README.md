@@ -65,6 +65,7 @@ libs/
 ├── maveric-server/  @maveric/server   controllers, rendering middleware
 └── maveric-vite/    @maveric/vite     Vite plugin
 docs/                                  technical documentation
+└── features/                          feature descriptions
 scripts/                               project scripts (documentation link check)
 ```
 
@@ -92,6 +93,7 @@ See [Architecture](docs/architecture.md) for details.
 | [Styling](docs/styling.md) | entry stylesheet and cascade layers, theme, Tailwind CSS, icons, browser support |
 | [Deployment](docs/deployment.md) | production artifact, configuration, Docker, Cloudflare Workers |
 | [Tooling](docs/tooling.md) | scripts, ESLint, formatting, editor, Git conventions |
+| [Features](docs/features/README.md) | descriptions of the application's features: structure, workflow, template |
 | [Roadmap](docs/roadmap.md) | planned features, known limitations |
 | [Documentation](docs/documentation.md) | structure, README formats, writing principles, keeping it up to date |
 

@@ -16,6 +16,7 @@ The documentation is extensive; read the relevant file before changing an area:
 - [docs/hot-reload.md](docs/hot-reload.md) — Fast Refresh, props refresh, stylesheets
 - [docs/primereact.md](docs/primereact.md) — imports, the patch rendering component styles on the server, its limits
 - [docs/styling.md](docs/styling.md) — entry stylesheet and cascade layers, theme utilities, where styles belong, icons, browser targets
+- [docs/features/README.md](docs/features/README.md) — feature documents: structure, requirement IDs, plan of attack, workflow, template
 - [docs/deployment.md](docs/deployment.md), [docs/tooling.md](docs/tooling.md), [docs/roadmap.md](docs/roadmap.md), [docs/documentation.md](docs/documentation.md)
 
 ## Commands
@@ -77,6 +78,7 @@ The user values this process; follow it.
 
 Also:
 
+- **Features** have a document in `docs/features/`, which holds the agreed plan as its plan of attack; follow [Features](docs/features/README.md#workflow). To continue a feature, read its document and pick up the next unticked step.
 - **Commits:** one per step; a concise message as described in [Tooling](docs/tooling.md#git), naming the change rather than its details. Refactors and fixes found along the way get their own commits. The user sometimes commits adjustments themselves: build on them, and squash only when asked, keeping their message (`git commit -C <commit>`).
 - **Honesty:** correct earlier claims explicitly when they turn out wrong; mark untested things as untested; report failures with their output.
 - **Ideas the user mentions in passing** go into `docs/roadmap.md`.
@@ -85,7 +87,7 @@ Also:
 
 ## Documentation maintenance
 
-Follow [docs/documentation.md](docs/documentation.md). In short: when a change is finished (multi-commit change: as its last step; single commit: in the same commit), search `docs/` and all READMEs for everything removed, changed or added; remove or align what's affected; extend existing topics for new functionality, but **agree with the user before creating a new topic or restructuring**; check the roadmap, the README tables and drifting counts; run `pnpm docs:check`.
+Follow [docs/documentation.md](docs/documentation.md). In short: when a change is finished (multi-commit change: as its last step; single commit: in the same commit), search `docs/` and all READMEs for everything removed, changed or added; remove or align what's affected; extend existing topics for new functionality, but **agree with the user before creating a new topic or restructuring**; check the roadmap, the README tables and drifting counts; for a feature, turn its notes into implementation details and remove its plan of attack; run `pnpm docs:check`.
 
 **This file is part of the check.** Nothing updates it automatically (`/init` only when run explicitly), and its details drift easily: the commands, the rules that are easy to break, the verification procedure and the environment pitfalls. Keep facts documented elsewhere as links rather than copies, so that `pnpm docs:check` notices when they move.
 

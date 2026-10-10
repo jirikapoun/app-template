@@ -18,6 +18,8 @@
 - **Linting of the UI package.** A better linting setup for `@app/ui`, for example a Tailwind plugin for ESLint (unknown and conflicting classes), `eslint-plugin-compat` (browser APIs, checked against the browserslist targets) and Stylelint for stylesheets. Work on the ESLint configuration has started as a local work in progress (a WebStorm shelf, `.idea/shelf/eslint/shelved.patch`, outside version control).
 - **Polyfills.** Once the code needs JavaScript APIs the targeted browsers lack, it needs polyfills. `@vitejs/plugin-legacy` injects them through `index.html`, so server-rendered pages would have to get them through the client manifest (see [Styling](styling.md#browser-support)).
 - **Smaller fonts.** Lara ships Inter as variable fonts of 345 kB (regular) and 381 kB (italic, loaded only when used). Subsetting them, or using system fonts, would make the first page load faster.
+- **Tests.** A test setup, and tests covering the features, each naming the requirements it verifies (see [Features](features/README.md#requirements)).
+- **A Claude Code skill for features.** Guiding Claude Code through feature documents: drafting one from the template, continuing a plan of attack with its next step.
 - **Views in the OpenAPI document.** HTML responses aren't described in the OpenAPI document yet (`Controller.endpoint()` adds an empty `text/html` content entry for routes with views). The idea is for `view()` to accept metadata, such as a description of the view, which `Controller.endpoint()` would pass into the OpenAPI document.
 
 ## Known limitations

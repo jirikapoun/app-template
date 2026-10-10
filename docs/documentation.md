@@ -8,6 +8,7 @@ How the project is documented, how to write documentation that fits in, and how 
 |---|---|---|
 | `README.md` | overview of the project: stack, quick start, scripts, structure, documentation index | everyone |
 | `docs/*.md` | technical topics, one per file | developers of the project |
+| `docs/features/*.md` | features: requirements, plan of attack, implementation details (see [Features](features/README.md)) | developers of the project |
 | `apps/*/README.md`, `packages/*/README.md` | purpose and specifics of an application package | developers of the project |
 | `libs/maveric-*/README.md` | usage and API of a Maveric package | users of the framework |
 | `libs/maveric/README.md` | index page of the Maveric project | anyone interested in the framework |
@@ -82,6 +83,7 @@ Outdated documentation is worse than none, so the documentation is checked whene
    3. or, when neither fits, restructure the topics by extracting parts of existing ones into a new topic — agree on it first, and use it sparingly.
 5. **Check the usual suspects:**
    - [Roadmap](roadmap.md): remove what's done or resolved, add new limitations and ideas;
+   - the document of the feature being implemented: implementation details, plan of attack, status (see [Features](features/README.md#plan-of-attack));
    - the project README: the documentation index, the scripts table, the repository structure;
    - counts that drift, such as the number of ESLint warnings in [Tooling](tooling.md#eslint);
    - `CLAUDE.md`.
